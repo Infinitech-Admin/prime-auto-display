@@ -174,7 +174,7 @@ export default function RegisterPage() {
           Create your account
         </h1>
         <p className="mb-7 mt-3 text-sm text-white/60">
-          Join Capital Jey Car Trading in a few quick steps.
+          Join Prime Auto Display Car Trading in a few quick steps.
         </p>
 
         {formError && (
@@ -284,7 +284,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -297,7 +297,7 @@ export default function RegisterPage() {
           )}
 
           {form.password.length > 0 && (
-            <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 bg-[#0B0B0B] p-3 text-sm">
+            <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 bg-[#1C0606] p-3 text-sm">
               <RuleItem met={rules.length}>10+ characters</RuleItem>
               <RuleItem met={rules.upper && rules.lower}>
                 Upper &amp; lowercase
@@ -358,7 +358,7 @@ function RuleItem({ met, children }: { met: boolean; children: ReactNode }) {
       className={`flex items-center gap-1.5 ${met ? "font-semibold text-white" : "text-white/50"}`}
     >
       {met ? (
-        <Check size={14} aria-hidden className="text-[#E31B23]" />
+        <Check size={14} aria-hidden className="text-[#9B1111]" />
       ) : (
         <X size={14} aria-hidden />
       )}

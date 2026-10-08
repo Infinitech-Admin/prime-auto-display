@@ -110,7 +110,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="mb-7 mt-3 text-sm text-white/60">
-          Sign in to your Capital Jey Car Trading account.
+          Sign in to your Prime Auto Display Car Trading account.
         </p>
 
         {formError && (
@@ -164,7 +164,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -184,7 +184,7 @@ export default function LoginPage() {
               name="remember"
               checked={form.remember}
               onChange={handleChange}
-              className="h-4 w-4 accent-[#E31B23]"
+              className="h-4 w-4 accent-[#9B1111]"
             />
             Remember me
           </label>
@@ -199,7 +199,7 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-7 border-t border-white/10 pt-6 text-center text-sm text-white/65">
-          New to Capital Jey Car Trading?{" "}
+          New to Prime Auto Display Car Trading?{" "}
           <Link href="/register" className={authLinkClass}>
             Create an account
           </Link>

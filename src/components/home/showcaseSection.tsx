@@ -26,6 +26,14 @@ const MAX_FEATURED = 6;
 const DEFAULT_LOAD_ERROR =
   "We couldn’t load the featured vehicles right now. Please try again.";
 
+/*
+  Prime Auto Display palette
+  maroon  #9B1111   hover #B91C1C
+  gold    #F9A602
+  dark    #1C0606
+  cream   #FDF5DC
+*/
+
 export default function ShowcaseSection() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -122,54 +130,46 @@ export default function ShowcaseSection() {
 
   return (
     <section
-      className="relative overflow-hidden bg-[var(--page-bg)] pb-10 text-[var(--foreground)] py-10"
+      className="relative overflow-hidden bg-[#1C0606] py-16 text-[#FDF5DC]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Cinematic background glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FF2D2D]/5 blur-[140px]" />
+      {/* Maroon glow behind the stage */}
+      <div className="pointer-events-none absolute left-1/2 top-[55%] h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9B1111]/35 blur-[150px]" />
 
       <div className="relative mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        <div className="flex max-w-7xl mx-auto justify-between items-center gap-10 lg:gap-20">
-          <div className="max-w-3xl mx-0 py-10">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="h-px w-10 bg-[#FF2D2D]" />
-              <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#FFFFFF]">
-                Featured Vehicles
-              </span>
-              <span className="h-px w-10 bg-[#FF2D2D]" />
-            </div>
-
-            <h2 className="text-4xl font-black tracking-tight text-[var(--foreground)] sm:text-5xl lg:text-6xl">
-              Drive <span className="text-[#FFFFFF]">Excellence.</span>
+        {/* Heading */}
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+          <div className="max-w-2xl border-l-4 border-[#F9A602] pl-5">
+            <h2 className="text-4xl font-black uppercase leading-[0.95] tracking-tight text-[#FDF5DC] sm:text-5xl lg:text-6xl">
+              Drive excellence.
             </h2>
 
-            <p className="mt-5 text-sm leading-7 text-[var(--muted)] sm:text-base">
-              Discover a refined collection of premium vehicles selected for
-              exceptional performance, sophisticated design, and lasting value.
+            <p className="mt-4 text-sm leading-7 text-[#FDF5DC]/70 sm:text-base">
+              A refined collection of premium vehicles, selected for
+              performance, design, and lasting value.
             </p>
           </div>
-          <div className="group mt-6 inline-block">
-            <Link
-              href="/showroom"
-              className="flex items-center gap-2 text-lg font-semibold text-[#FFFFFF] underline decoration-transparent decoration-2 underline-offset-4 transition-all duration-300 hover:decoration-[#FF2D2D]"
-            >
-              Visit Showroom
-              <ArrowRight
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </Link>
-          </div>
+
+          <Link
+            href="/showroom"
+            className="group inline-flex items-center gap-2 border-b-2 border-[#F9A602] pb-1 text-base font-bold text-[#F9A602] transition-colors duration-300 hover:border-[#FDF5DC] hover:text-[#FDF5DC] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F9A602]"
+          >
+            Visit showroom
+            <ArrowRight
+              size={16}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </Link>
         </div>
 
         {/* Loading */}
         {isLoading && (
           <div className="mx-auto mt-16 flex h-[360px] max-w-4xl flex-col items-center justify-center text-center sm:h-[480px] lg:h-[620px]">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/10">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#FF2D2D]/40 border-t-[#FF2D2D]" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#F9A602]/30 bg-[#9B1111]/20">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#F9A602]/30 border-t-[#F9A602]" />
             </div>
-            <p className="mt-6 text-lg font-semibold text-[var(--foreground)]">
+            <p className="mt-6 text-lg font-semibold text-[#FDF5DC]">
               Loading featured vehicles...
             </p>
           </div>
@@ -177,13 +177,17 @@ export default function ShowcaseSection() {
 
         {/* Error */}
         {!isLoading && loadError && (
-          <div className="mx-auto mt-16 flex max-w-xl flex-col items-center rounded-[28px] border border-[#FF2D2D]/30 bg-[#111111] px-6 py-12 text-center">
-            <p className="text-xl font-bold text-white">Something went wrong</p>
-            <p className="mt-3 text-sm leading-6 text-zinc-300">{loadError}</p>
+          <div className="mx-auto mt-16 flex max-w-xl flex-col items-center border-t-4 border-[#9B1111] bg-[#2A0A0A] px-6 py-12 text-center">
+            <p className="text-xl font-bold text-[#FDF5DC]">
+              Something went wrong
+            </p>
+            <p className="mt-3 text-sm leading-6 text-[#FDF5DC]/70">
+              {loadError}
+            </p>
             <button
               type="button"
               onClick={() => load()}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#FF5A5A]"
+              className="chamfer mt-6 inline-flex items-center gap-2 bg-[#F9A602] px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors duration-300 hover:bg-[#FDF5DC] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <RotateCcw size={16} />
               Retry
@@ -193,26 +197,26 @@ export default function ShowcaseSection() {
 
         {/* Empty */}
         {!isLoading && !loadError && total === 0 && (
-          <div className="mx-auto mt-16 max-w-xl rounded-[28px] border border-dashed border-white/15 px-6 py-12 text-center">
-            <p className="text-lg font-semibold text-[var(--foreground)]">
+          <div className="mx-auto mt-16 max-w-xl border border-dashed border-[#F9A602]/30 px-6 py-12 text-center">
+            <p className="text-lg font-semibold text-[#FDF5DC]">
               No vehicles to feature yet
             </p>
-            <p className="mt-2 text-sm text-[var(--muted)]">
+            <p className="mt-2 text-sm text-[#FDF5DC]/70">
               Please check back soon for new arrivals.
             </p>
           </div>
         )}
 
-        {/* Car Showcase */}
+        {/* Car showcase */}
         {!isLoading && !loadError && total > 0 && activeCar && (
-          <div className="relative mt-16">
+          <div className="relative mt-14">
             {total > 1 && (
               <>
                 <button
                   type="button"
                   onClick={goPrevious}
                   aria-label="Previous vehicle"
-                  className="absolute left-1 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#060606]/60 text-white backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:border-[#FF2D2D] hover:bg-[#FF2D2D] hover:text-black sm:left-5 sm:h-12 sm:w-12 lg:left-10"
+                  className="absolute left-1 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#F9A602]/50 bg-[#1C0606]/70 text-[#F9A602] backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:border-[#F9A602] hover:bg-[#F9A602] hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602] sm:left-5 sm:h-12 sm:w-12 lg:left-10"
                 >
                   <ArrowLeft size={19} />
                 </button>
@@ -221,7 +225,7 @@ export default function ShowcaseSection() {
                   type="button"
                   onClick={goNext}
                   aria-label="Next vehicle"
-                  className="absolute right-1 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#060606]/60 text-white backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:border-[#FF2D2D] hover:bg-[#FF2D2D] hover:text-black sm:right-5 sm:h-12 sm:w-12 lg:right-10"
+                  className="absolute right-1 top-1/2 z-50 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#F9A602]/50 bg-[#1C0606]/70 text-[#F9A602] backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:border-[#F9A602] hover:bg-[#F9A602] hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602] sm:right-5 sm:h-12 sm:w-12 lg:right-10"
                 >
                   <ArrowRight size={19} />
                 </button>
@@ -229,6 +233,9 @@ export default function ShowcaseSection() {
             )}
 
             <div className="relative mx-auto h-[360px] max-w-[1500px] sm:h-[480px] lg:h-[620px]">
+              {/* Gold floor line the cars sit on */}
+              <div className="pointer-events-none absolute bottom-[14%] left-0 right-0 z-0 h-px bg-gradient-to-r from-transparent via-[#F9A602]/70 to-transparent" />
+
               {cars.map((car, index) => {
                 const position = getPosition(index);
 
@@ -258,9 +265,9 @@ export default function ShowcaseSection() {
                     className={`absolute top-1/2 h-full -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${positionClass}`}
                   >
                     <div className="relative h-full w-full">
-                      {/* Floor reflection/glow */}
+                      {/* Floor glow */}
                       {isCenter && (
-                        <div className="absolute bottom-[4%] left-1/2 h-16 w-[65%] -translate-x-1/2 rounded-full bg-[#FF2D2D]/20 blur-3xl transition-opacity duration-700" />
+                        <div className="absolute bottom-[4%] left-1/2 h-16 w-[65%] -translate-x-1/2 rounded-full bg-[#F9A602]/20 blur-3xl transition-opacity duration-700" />
                       )}
 
                       <Image
@@ -281,7 +288,7 @@ export default function ShowcaseSection() {
               })}
             </div>
 
-            {/* Car Details */}
+            {/* Car details */}
             <div
               key={`${activeCar.id}-${direction}`}
               className={`relative z-40 mx-auto mt-8 max-w-4xl text-center ${
@@ -290,51 +297,47 @@ export default function ShowcaseSection() {
                   : "animate-[showcaseDetailsPrev_500ms_ease-out]"
               }`}
             >
-              <div className="flex items-center justify-center gap-2 text-md text-[var(--muted-soft)]">
-                <span>{activeCar.year}</span>
-                <span>•</span>
+              <div className="flex items-center justify-center gap-3 text-base text-[#F9A602]">
+                <span className="font-semibold">{activeCar.year}</span>
+                <span className="h-1 w-1 rounded-full bg-[#FDF5DC]/40" />
                 <span>{activeCar.type}</span>
-                <span>•</span>
+                <span className="h-1 w-1 rounded-full bg-[#FDF5DC]/40" />
                 <span>{activeCar.mileage}</span>
               </div>
 
-              <h3 className="mt-2 text-2xl font-bold text-[var(--foreground)] sm:text-3xl">
+              <h3 className="mt-2 text-3xl font-black uppercase tracking-tight text-[#FDF5DC] sm:text-4xl">
                 {activeCar.name}
               </h3>
 
               {/* Specs */}
-              <div className="mt-6 flex items-center justify-center divide-x divide-[var(--border)]">
+              <div className="mt-6 flex items-center justify-center divide-x divide-[#F9A602]/25">
                 <div className="flex items-center gap-2 px-4 sm:px-7">
-                  <Gauge size={17} className="text-[#FFFFFF]" />
+                  <Gauge size={18} className="text-[#F9A602]" />
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
+                    <p className="text-sm font-semibold text-[#FDF5DC]">
                       {activeCar.engine}
                     </p>
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--muted-soft)]">
-                      Engine
-                    </p>
+                    <p className="text-[11px] text-[#FDF5DC]/60">Engine</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 px-4 sm:px-7">
-                  <CarFront size={17} className="text-[#FFFFFF]" />
+                  <CarFront size={18} className="text-[#F9A602]" />
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
+                    <p className="text-sm font-semibold text-[#FDF5DC]">
                       {activeCar.horsepower}
                     </p>
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--muted-soft)]">
-                      Power
-                    </p>
+                    <p className="text-[11px] text-[#FDF5DC]/60">Power</p>
                   </div>
                 </div>
 
                 <div className="hidden items-center gap-2 px-4 sm:flex sm:px-7">
-                  <Settings2 size={17} className="text-[#FFFFFF]" />
+                  <Settings2 size={18} className="text-[#F9A602]" />
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
+                    <p className="text-sm font-semibold text-[#FDF5DC]">
                       {activeCar.transmission}
                     </p>
-                    <p className="text-[10px] uppercase tracking-wider text-[var(--muted-soft)]">
+                    <p className="text-[11px] text-[#FDF5DC]/60">
                       Transmission
                     </p>
                   </div>
@@ -342,12 +345,12 @@ export default function ShowcaseSection() {
               </div>
 
               {/* CTA */}
-              <div className="mt-7">
+              <div className="mt-8">
                 <Link
                   href={`/showroom/car/${activeCar.id}`}
-                  className="group inline-flex items-center gap-3 rounded-full border border-[#FF2D2D] px-6 py-3 text-sm font-semibold text-[#FFFFFF] transition-all duration-300 hover:scale-105 hover:bg-[#FF2D2D] hover:text-black"
+                  className="chamfer group inline-flex items-center gap-3 bg-[#9B1111] px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors duration-300 hover:bg-[#B91C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
-                  View Details
+                  View details
                   <ArrowRight
                     size={16}
                     className="transition-transform duration-300 group-hover:translate-x-1"
@@ -357,7 +360,7 @@ export default function ShowcaseSection() {
 
               {/* Dots */}
               {total > 1 && (
-                <div className="mt-7 flex items-center justify-center gap-2">
+                <div className="mt-8 flex items-center justify-center gap-2">
                   {cars.map((car, index) => (
                     <button
                       key={car.id}
@@ -369,8 +372,8 @@ export default function ShowcaseSection() {
                       aria-label={`View ${car.name}`}
                       className={`h-1.5 rounded-full transition-all duration-500 ${
                         index === safeIndex
-                          ? "w-7 bg-[#FF2D2D]"
-                          : "w-1.5 bg-zinc-700 hover:bg-zinc-500"
+                          ? "w-8 bg-[#F9A602]"
+                          : "w-1.5 bg-[#FDF5DC]/25 hover:bg-[#FDF5DC]/50"
                       }`}
                     />
                   ))}

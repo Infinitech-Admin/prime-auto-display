@@ -118,7 +118,7 @@ export default function NotificationBell({
 
       await sendToServer(sub);
       setStatus("subscribed");
-      showNotice("Done! You'll get updates from Capital Jey Car Trading.");
+      showNotice("Done! You'll get updates from Prime Auto Display Car Trading.");
     } catch {
       showNotice("Couldn't turn on notifications. Please try again.");
     } finally {

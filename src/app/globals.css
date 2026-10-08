@@ -2,8 +2,8 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0b0b0b;
-  --brand: #e31b23;
+  --foreground: #1C0606;
+  --brand: #9B1111;
   color-scheme: light;
 }
 
@@ -48,7 +48,7 @@ body {
   height: 12px;
   background: repeating-linear-gradient(
     115deg,
-    #e31b23 0 8px,
-    #0b0b0b 8px 16px
+    #9B1111 0 8px,
+    #1C0606 8px 16px
   );
 }

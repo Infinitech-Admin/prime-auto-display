@@ -10,7 +10,7 @@ import ChatWidget from "@/components/chat-widget";
 import FloatingSocial from "@/components/floating-social";
 import AnimatedSplash from "@/components/animated-splash";
 
-// Squared, techy headings that match the "CAPITAL JEY" lettering on the logo
+// Squared, techy headings that match the "Prime Auto Display" lettering on the logo
 const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
   subsets: ["latin"],
@@ -24,15 +24,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Capital Jey Car Trading | Cars for Sale",
-    template: "%s | Capital Jey Car Trading",
+    default: "Prime Auto Display Car Trading | Cars for Sale",
+    template: "%s | Prime Auto Display Car Trading",
   },
 
   description:
-    "Discover quality vehicles for sale at Capital Jey Car Trading. Browse premium cars, explore detailed specifications, view photos and videos, and inquire about your next vehicle.",
+    "Discover quality vehicles for sale at Prime Auto Display Car Trading. Browse premium cars, explore detailed specifications, view photos and videos, and inquire about your next vehicle.",
 
   keywords: [
-    "Capital Jey Car Trading",
+    "Prime Auto Display Car Trading",
     "cars for sale",
     "used cars",
     "pre-owned cars",
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     "premium cars",
   ],
 
-  authors: [{ name: "Capital Jey Car Trading" }],
-  creator: "Capital Jey Car Trading",
-  publisher: "Capital Jey Car Trading",
+  authors: [{ name: "Prime Auto Display Car Trading" }],
+  creator: "Prime Auto Display Car Trading",
+  publisher: "Prime Auto Display Car Trading",
 
   robots: {
     index: true,
@@ -57,21 +57,21 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Capital Jey Car Trading",
+    title: "Prime Auto Display Car Trading",
   },
 
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: "Capital Jey Car Trading | Cars for Sale",
+    title: "Prime Auto Display Car Trading | Cars for Sale",
     description:
       "Explore quality vehicles with detailed specifications, photos, videos, and easy inquiry options.",
-    siteName: "Capital Jey Car Trading",
+    siteName: "Prime Auto Display Car Trading",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Capital Jey Car Trading | Cars for Sale",
+    title: "Prime Auto Display Car Trading | Cars for Sale",
     description:
       "Find your next vehicle. Browse our latest inventory and explore every car in detail.",
   },
@@ -86,7 +86,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#0B0B0B",
+  themeColor: "#1C0606",
 };
 
 export default function RootLayout({
@@ -99,7 +99,7 @@ export default function RootLayout({
       lang="en"
       className={`${rajdhani.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-[#0B0B0B]">
+      <body className="min-h-full flex flex-col bg-white text-[#1C0606]">
         <AuthProvider>
           <CartProvider>
             {children}

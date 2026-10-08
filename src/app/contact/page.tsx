@@ -22,7 +22,7 @@ import Footer from "../../components/layout/footer";
 // Anything left empty is hidden automatically instead of showing placeholders.
 // TODO: fill in HOURS when you have the schedule.
 // ---------------------------------------------------------------------------
-const BUSINESS_NAME = "Capital Jey Car Trading";
+const BUSINESS_NAME = "Prime Auto Display Car Trading";
 const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
 const ADDRESS_LINE_1 = "Blk 28, Lot 26 Vatican City Drive,";
 const ADDRESS_LINE_2 = "BF Resort Village, Talon Dos, Las Piñas City 1747";
@@ -119,7 +119,7 @@ const PHONE_PATTERN = /^09\d{9}$/;
 
 // Dark inputs on a dark surface. Red border on focus / error.
 const inputClass =
-  "w-full border-2 border-white/10 bg-[#1A1A1A] px-4 py-3.5 text-white placeholder:text-white/35 transition-colors focus:border-[#E31B23] focus:bg-[#202020] focus:outline-none aria-[invalid=true]:border-[#E31B23]";
+  "w-full border-2 border-white/10 bg-[#1A1A1A] px-4 py-3.5 text-white placeholder:text-white/35 transition-colors focus:border-[#9B1111] focus:bg-[#202020] focus:outline-none aria-[invalid=true]:border-[#9B1111]";
 
 // Label + input + error message
 function Field({
@@ -138,7 +138,7 @@ function Field({
       <span className="mb-2 flex items-center gap-1 text-sm font-semibold text-white">
         {label}
         {required ? (
-          <span className="text-[#E31B23]" aria-label="required">
+          <span className="text-[#9B1111]" aria-label="required">
             *
           </span>
         ) : null}
@@ -303,12 +303,12 @@ export default function Contact() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-[#0B0B0B] text-white">
+      <main className="min-h-screen bg-[#1C0606] text-white">
         {/* HEADER: black, oversized type, red slash on the right */}
-        <section className="relative overflow-hidden bg-[#0B0B0B]">
+        <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#E31B23] lg:block"
+            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#9B1111] lg:block"
           />
           <div
             aria-hidden="true"
@@ -319,7 +319,7 @@ export default function Contact() {
             <div className="lg:min-w-0 lg:flex-1">
               <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
                 Let&apos;s talk
-                <span className="block text-[#E31B23]">cars.</span>
+                <span className="block text-[#F9A602]">cars.</span>
               </h1>
 
               <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
@@ -331,7 +331,7 @@ export default function Contact() {
             </div>
 
             {/* Right side: what you can do + direct line */}
-            <div className="border-t-4 border-[#E31B23] bg-[#161616]">
+            <div className="border-t-4 border-[#9B1111] bg-[#161616]">
               <div className="p-6 sm:p-7">
                 <h2 className="text-2xl font-bold uppercase">
                   How can we help?
@@ -358,7 +358,7 @@ export default function Contact() {
                     <li key={item.label}>
                       <Link
                         href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 transition-colors hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className="group flex items-center justify-between gap-4 py-4 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         <span>
                           <span className="block text-lg font-bold uppercase leading-tight">
@@ -370,7 +370,7 @@ export default function Contact() {
                         </span>
                         <ArrowRight
                           size={20}
-                          className="shrink-0 text-[#E31B23] transition-transform group-hover:translate-x-1"
+                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
                         />
                       </Link>
                     </li>
@@ -380,7 +380,7 @@ export default function Contact() {
                 {PHONE_DISPLAY && PHONE_TEL ? (
                   <a
                     href={`tel:${PHONE_TEL}`}
-                    className="mt-6 flex items-center gap-4 bg-[#E31B23] px-5 py-4 text-white transition-colors hover:bg-white hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="mt-6 flex items-center gap-4 bg-[#9B1111] px-5 py-4 text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     <Phone size={22} className="shrink-0" />
                     <span>
@@ -402,7 +402,7 @@ export default function Contact() {
                 >
                   <MapPin
                     size={18}
-                    className="mt-0.5 shrink-0 text-[#E31B23]"
+                    className="mt-0.5 shrink-0 text-[#9B1111]"
                   />
                   <span>
                     {ADDRESS_LINE_1} {ADDRESS_LINE_2}
@@ -415,7 +415,7 @@ export default function Contact() {
         </section>
 
         {/* QUICK CONTACT: solid red strip, black icon blocks */}
-        <section className="bg-[#E31B23] text-white">
+        <section className="bg-[#9B1111] text-white">
           <ul className="mx-auto grid max-w-7xl divide-black/25 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x">
             {contactOptions.map(({ icon: Icon, title, value, href }) => (
               <li key={title}>
@@ -427,7 +427,7 @@ export default function Contact() {
                   }
                   className="group flex h-full items-start gap-4 border-t-4 border-transparent px-5 py-6 transition-colors hover:border-white hover:bg-black/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white sm:px-6"
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#0B0B0B] text-white transition-colors group-hover:bg-white group-hover:text-[#E31B23]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-white transition-colors group-hover:bg-white group-hover:text-[#9B1111]">
                     <Icon size={20} />
                   </span>
                   <span className="min-w-0">
@@ -450,7 +450,7 @@ export default function Contact() {
             <div className="grid gap-10 lg:grid-cols-[1.35fr_0.65fr] lg:gap-14">
               <div>
                 <h2 className="flex items-center gap-3 text-3xl font-bold uppercase sm:text-4xl">
-                  <Send size={26} className="text-[#E31B23]" />
+                  <Send size={26} className="text-[#9B1111]" />
                   Send an enquiry
                 </h2>
 
@@ -585,14 +585,14 @@ export default function Contact() {
                           setErrors((current) => ({ ...current, privacy: "" }));
                         }
                       }}
-                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#E31B23]"
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#9B1111]"
                     />
                     <span>
                       I agree to the{" "}
                       <button
                         type="button"
                         onClick={() => setActiveModal("privacy")}
-                        className="font-semibold text-[#E31B23] underline underline-offset-2 transition-colors hover:text-white"
+                        className="font-semibold text-[#9B1111] underline underline-offset-2 transition-colors hover:text-white"
                       >
                         Privacy Policy
                       </button>{" "}
@@ -612,7 +612,7 @@ export default function Contact() {
                       className={`border-l-4 px-4 py-3 text-sm font-medium ${
                         status.type === "success"
                           ? "border-white bg-white/10 text-white"
-                          : "border-[#E31B23] bg-[#E31B23]/15 text-[#FF8A90]"
+                          : "border-[#9B1111] bg-[#9B1111]/15 text-[#FF8A90]"
                       }`}
                     >
                       {status.message}
@@ -627,7 +627,7 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={!acceptedPrivacy || submitting}
-                      className="chamfer inline-flex items-center justify-center gap-2 bg-[#E31B23] px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+                      className="chamfer inline-flex items-center justify-center gap-2 bg-[#9B1111] px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
                     >
                       {submitting ? "Sending..." : "Send inquiry"}
                       <ArrowRight size={16} />
@@ -638,9 +638,9 @@ export default function Contact() {
 
               {/* Side panel: hours and showroom */}
               <aside className="lg:sticky lg:top-28 lg:self-start">
-                <div className="border-t-4 border-[#E31B23] bg-[#1A1A1A] p-6 sm:p-7">
+                <div className="border-t-4 border-[#9B1111] bg-[#1A1A1A] p-6 sm:p-7">
                   <h3 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                    <Clock3 size={22} className="text-[#E31B23]" />
+                    <Clock3 size={22} className="text-[#9B1111]" />
                     Opening hours
                   </h3>
 
@@ -667,11 +667,11 @@ export default function Contact() {
                     href={MAPS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-6 flex items-start gap-3 border-t border-white/10 pt-5 text-sm font-medium text-white transition-colors hover:text-[#E31B23]"
+                    className="mt-6 flex items-start gap-3 border-t border-white/10 pt-5 text-sm font-medium text-white transition-colors hover:text-[#9B1111]"
                   >
                     <MapPin
                       size={18}
-                      className="mt-0.5 shrink-0 text-[#E31B23]"
+                      className="mt-0.5 shrink-0 text-[#9B1111]"
                     />
                     <span>
                       {ADDRESS_LINE_1}
@@ -686,13 +686,13 @@ export default function Contact() {
         </section>
 
         {/* BOTTOM BAND: white, the only light section, used as contrast */}
-        <section className="bg-white text-[#0B0B0B]">
+        <section className="bg-white text-[#1C0606]">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <div className="border-l-8 border-[#E31B23] pl-5">
+            <div className="border-l-8 border-[#9B1111] pl-5">
               <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl">
                 Book your next journey
               </h2>
-              <p className="mt-3 max-w-xl text-base leading-7 text-[#0B0B0B]/75">
+              <p className="mt-3 max-w-xl text-base leading-7 text-[#1C0606]/75">
                 Explore our inventory, compare models side by side, and speak
                 with an expert about the right fit for your next move.
               </p>
@@ -701,14 +701,14 @@ export default function Contact() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center bg-[#E31B23] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#0B0B0B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0B0B0B]"
+                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]"
               >
                 Visit Showroom
               </Link>
 
               <Link
                 href="/sell-trade"
-                className="chamfer inline-flex items-center justify-center bg-[#0B0B0B] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0B0B0B]"
+                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]"
               >
                 Sell / Trade Car
               </Link>
@@ -725,7 +725,7 @@ export default function Contact() {
             role="dialog"
             aria-modal="true"
             aria-label={privacyCopy.title}
-            className="max-h-[85vh] w-full max-w-2xl overflow-hidden border-t-4 border-[#E31B23] bg-[#141414] text-white shadow-2xl"
+            className="max-h-[85vh] w-full max-w-2xl overflow-hidden border-t-4 border-[#9B1111] bg-[#141414] text-white shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
               <h3 className="text-2xl font-bold uppercase">
@@ -735,7 +735,7 @@ export default function Contact() {
                 type="button"
                 aria-label="Close privacy policy"
                 onClick={() => setActiveModal(null)}
-                className="flex h-10 w-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-[#E31B23] hover:bg-[#E31B23]"
+                className="flex h-10 w-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111]"
               >
                 <X size={18} />
               </button>

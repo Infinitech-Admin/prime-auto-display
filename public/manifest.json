@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Capital Jey Car Trading",
-  "short_name": "Capital Jey",
-  "description": "Browse quality pre-owned cars for sale at Capital Jey Car Trading in Las Piñas City. See photos and videos, book a test drive, or sell and trade your car.",
+  "name": "Prime Auto Display Car Trading",
+  "short_name": "Prime Auto Display",
+  "description": "Browse quality pre-owned cars for sale at Prime Auto Display Car Trading in Las Piñas City. See photos and videos, book a test drive, or sell and trade your car.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -142,14 +142,14 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Capital Jey Car Trading homepage on desktop"
+      "label": "Prime Auto Display Car Trading homepage on desktop"
     },
     {
       "src": "/screenshots/mobile-home.png",
       "sizes": "720x1280",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Capital Jey Car Trading homepage on mobile"
+      "label": "Prime Auto Display Car Trading homepage on mobile"
     }
   ]
 }

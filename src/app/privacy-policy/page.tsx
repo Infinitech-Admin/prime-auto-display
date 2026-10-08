@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import LegalPage, { type LegalSection } from "@/components/layout/legal-page";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Capital Jey Car Trading",
+  title: "Privacy Policy | Prime Auto Display Car Trading",
   description:
-    "How Capital Jey Car Trading collects, uses, and protects your personal information.",
+    "How Prime Auto Display Car Trading collects, uses, and protects your personal information.",
 };
 
 const sections: LegalSection[] = [
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
       eyebrow="Legal"
       title="Privacy Policy"
       updated="September 29, 2026"
-      intro="At Capital Jey Car Trading, we value your trust and are committed to protecting your personal information. This policy explains what we collect, why we collect it, and the choices you have."
+      intro="At Prime Auto Display Car Trading, we value your trust and are committed to protecting your personal information. This policy explains what we collect, why we collect it, and the choices you have."
       sections={sections}
     />
   );

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Bot, MessageCircle, Send, User, X } from "lucide-react";
 
-const BUSINESS_NAME = "Capital Jey Car Trading";
+const BUSINESS_NAME = "Prime Auto Display Car Trading";
 const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
 const ADDRESS = "Blk 28, Lot 26 Vatican City Drive, BF Resort Village, Talon Dos, Las Piñas City";
 

@@ -19,18 +19,18 @@ const navigation = [
   { name: "Contact", href: "/contact" },
 ];
 
-// Capital Jey Car Trading palette
-// black #0B0B0B | red #E31B23 | red hover #FF3B43 | white #FFFFFF
+// Prime Auto Display Car Trading palette
+// black #1C0606 | red #9B1111 | red hover #B91C1C | white #FFFFFF
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 // Square icon buttons with a red edge on hover (no glow)
 const iconButton =
-  "border border-white/20 bg-white/5 text-white transition-colors duration-200 hover:border-[#E31B23] hover:bg-[#E31B23]";
+  "border border-white/20 bg-white/5 text-white transition-colors duration-200 hover:border-[#9B1111] hover:bg-[#9B1111]";
 
 // Same look for the Login / account button rendered inside <UserMenu />
 const loginStyle =
-  "[&>a]:rounded-none [&>a]:border [&>a]:border-white/20 [&>a:hover]:border-[#E31B23] [&>a:hover]:bg-[#E31B23] [&>button]:rounded-none [&>button]:border [&>button]:border-white/20 [&>button:hover]:border-[#E31B23]";
+  "[&>a]:rounded-none [&>a]:border [&>a]:border-white/20 [&>a:hover]:border-[#9B1111] [&>a:hover]:bg-[#9B1111] [&>button]:rounded-none [&>button]:border [&>button]:border-white/20 [&>button:hover]:border-[#9B1111]";
 
 // Minimal shape of the event we care about, not in the standard lib.dom types yet.
 interface BeforeInstallPromptEvent extends Event {
@@ -136,7 +136,7 @@ export default function Navbar() {
   return (
     <>
       {/* Always solid black, with a red line underneath */}
-      <header className="sticky top-0 z-50 border-b-2 border-[#E31B23] bg-[#0B0B0B]">
+      <header className="sticky top-0 z-50 border-b-2 border-[#9B1111] bg-[#1C0606]">
         <nav
           aria-label="Main"
           className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8"
@@ -145,7 +145,7 @@ export default function Navbar() {
             {/* LOGO */}
             <Link
               href="/"
-              aria-label="Capital Jey Car Trading home"
+              aria-label="Prime Auto Display Car Trading home"
               className={`group flex w-fit items-center justify-self-start ${focusRing}`}
             >
               <Wordmark className="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl" />
@@ -161,7 +161,7 @@ export default function Navbar() {
                     key={item.name}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={`relative whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold uppercase tracking-wide xl:px-3.5 xl:text-sm transition-colors duration-200 ${focusRing} ${active ? "text-white after:absolute after:inset-x-3 after:-bottom-[26px] after:h-[3px] after:bg-[#E31B23]" : "text-white/70 hover:text-white"}`}
+                    className={`relative whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold uppercase tracking-wide xl:px-3.5 xl:text-sm transition-colors duration-200 ${focusRing} ${active ? "text-white after:absolute after:inset-x-3 after:-bottom-[26px] after:h-[3px] after:bg-[#9B1111]" : "text-white/70 hover:text-white"}`}
                   >
                     {item.name}
                   </Link>
@@ -196,7 +196,7 @@ export default function Navbar() {
               >
                 <ShoppingCart size={20} strokeWidth={2} />
                 {totalItems > 0 && (
-                  <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[20px] items-center justify-center bg-[#E31B23] px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[20px] items-center justify-center bg-[#9B1111] px-1 text-[10px] font-bold text-white">
                     {totalItems > 99 ? "99+" : totalItems}
                   </span>
                 )}
@@ -214,7 +214,7 @@ export default function Navbar() {
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-menu"
                 onClick={() => setIsMenuOpen((open) => !open)}
-                className={`flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12 lg:hidden ${iconButton} ${isMenuOpen ? "!border-[#E31B23] !bg-[#E31B23]" : ""} ${focusRing}`}
+                className={`flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12 lg:hidden ${iconButton} ${isMenuOpen ? "!border-[#9B1111] !bg-[#9B1111]" : ""} ${focusRing}`}
               >
                 {isMenuOpen ? (
                   <X size={21} strokeWidth={2} />
@@ -243,13 +243,13 @@ export default function Navbar() {
 
         {/* Navigation Drawer */}
         <div
-          className={`absolute right-0 top-0 h-full w-full max-w-md border-l-2 border-[#E31B23] bg-[#0B0B0B] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute right-0 top-0 h-full w-full max-w-md border-l-2 border-[#9B1111] bg-[#1C0606] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           {/* Drawer Header */}
           <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-5 sm:h-[76px] sm:px-6">
             <Link
               href="/"
-              aria-label="Capital Jey Car Trading home"
+              aria-label="Prime Auto Display Car Trading home"
               onClick={() => setIsMenuOpen(false)}
               className={`group ${focusRing}`}
             >
@@ -300,12 +300,12 @@ export default function Navbar() {
                         href={item.href}
                         aria-current={active ? "page" : undefined}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`group flex min-h-[62px] items-center justify-between border-b border-white/10 px-3 text-xl font-semibold uppercase tracking-wide transition-colors duration-200 sm:min-h-[68px] sm:text-2xl ${focusRing} ${active ? "border-l-4 border-l-[#E31B23] bg-white/5 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        className={`group flex min-h-[62px] items-center justify-between border-b border-white/10 px-3 text-xl font-semibold uppercase tracking-wide transition-colors duration-200 sm:min-h-[68px] sm:text-2xl ${focusRing} ${active ? "border-l-4 border-l-[#9B1111] bg-white/5 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                       >
                         {item.name}
                         <ArrowRight
                           size={19}
-                          className={`transition-all duration-200 ${active ? "text-[#E31B23]" : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
+                          className={`transition-all duration-200 ${active ? "text-[#9B1111]" : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
                         />
                       </Link>
                     </li>

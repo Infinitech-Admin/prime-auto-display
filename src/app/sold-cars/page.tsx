@@ -35,7 +35,7 @@ const SHOW_PRICE = true;
 const CARS_PER_PAGE = 12;
 
 const fieldClass =
-  "h-12 w-full border-2 border-white/10 bg-[#1A1A1A] px-4 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#E31B23] focus:bg-[#202020]";
+  "h-12 w-full border-2 border-white/10 bg-[#1A1A1A] px-4 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#9B1111] focus:bg-[#202020]";
 
 export default function SoldCarsPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -133,12 +133,12 @@ export default function SoldCarsPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0B0B0B] text-white">
+      <main className="min-h-screen bg-[#1C0606] text-white">
         {/* HEADER */}
-        <section className="relative overflow-hidden bg-[#0B0B0B]">
+        <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#E31B23] lg:block"
+            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#9B1111] lg:block"
           />
           <div
             aria-hidden="true"
@@ -149,7 +149,7 @@ export default function SoldCarsPage() {
             <div className="lg:min-w-0 lg:flex-1">
               <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
                 Cars we&apos;ve
-                <span className="block text-[#E31B23]">found homes.</span>
+                <span className="block text-[#F9A602]">found homes.</span>
               </h1>
 
               <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
@@ -159,14 +159,14 @@ export default function SoldCarsPage() {
             </div>
 
             {/* Right side: sold count + quick links */}
-            <div className="w-full border-t-4 border-[#E31B23] bg-[#161616] lg:w-[400px] lg:shrink-0">
+            <div className="w-full border-t-4 border-[#9B1111] bg-[#161616] lg:w-[400px] lg:shrink-0">
               <div className="p-6 sm:p-7">
                 <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <BadgeCheck size={22} className="text-[#E31B23]" />
+                  <BadgeCheck size={22} className="text-[#9B1111]" />
                   Sold so far
                 </h2>
 
-                <div className="mt-5 border-l-4 border-[#E31B23] bg-[#0B0B0B] p-5">
+                <div className="mt-5 border-l-4 border-[#9B1111] bg-[#1C0606] p-5">
                   {isLoading ? (
                     <p className="text-sm text-white/60">Counting...</p>
                   ) : loadError ? (
@@ -194,12 +194,12 @@ export default function SoldCarsPage() {
                     <li key={item.label}>
                       <Link
                         href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className="group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         {item.label}
                         <ArrowRight
                           size={18}
-                          className="shrink-0 text-[#E31B23] transition-transform group-hover:translate-x-1"
+                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
                         />
                       </Link>
                     </li>
@@ -215,9 +215,9 @@ export default function SoldCarsPage() {
         <section className="bg-[#111111]">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
             {/* FILTERS */}
-            <div className="mb-10 border-t-4 border-[#E31B23] bg-[#161616] p-5 sm:p-6">
+            <div className="mb-10 border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-6">
               <h2 className="mb-4 flex items-center gap-3 text-xl font-bold uppercase">
-                <SlidersHorizontal size={20} className="text-[#E31B23]" />
+                <SlidersHorizontal size={20} className="text-[#9B1111]" />
                 Search &amp; filter
               </h2>
 
@@ -225,7 +225,7 @@ export default function SoldCarsPage() {
                 <label className="relative block">
                   <Search
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#E31B23]"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9B1111]"
                   />
                   <input
                     value={search}
@@ -253,7 +253,7 @@ export default function SoldCarsPage() {
                   </select>
                   <ChevronDown
                     size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#E31B23]"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export default function SoldCarsPage() {
                   </select>
                   <ChevronDown
                     size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#E31B23]"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
                   />
                 </div>
 
@@ -290,7 +290,7 @@ export default function SoldCarsPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="inline-flex h-12 items-center justify-center gap-2 border-2 border-white/20 px-5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#E31B23] hover:bg-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="inline-flex h-12 items-center justify-center gap-2 border-2 border-white/20 px-5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     <X size={15} />
                     Clear
@@ -301,8 +301,8 @@ export default function SoldCarsPage() {
 
             {/* CONTENT */}
             {isLoading ? (
-              <div className="border-t-4 border-[#E31B23] bg-[#161616] px-6 py-16 text-center">
-                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#E31B23]" />
+              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
                 <p className="mt-6 text-2xl font-bold uppercase">
                   Loading portfolio...
                 </p>
@@ -311,7 +311,7 @@ export default function SoldCarsPage() {
                 </p>
               </div>
             ) : loadError ? (
-              <div className="border-t-4 border-[#E31B23] bg-[#161616] px-6 py-16 text-center">
+              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
                 <p className="text-2xl font-bold uppercase">
                   Something went wrong
                 </p>
@@ -321,14 +321,14 @@ export default function SoldCarsPage() {
                 <button
                   type="button"
                   onClick={() => load()}
-                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#E31B23] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   <RotateCcw size={16} />
                   Retry
                 </button>
               </div>
             ) : filteredCars.length === 0 ? (
-              <div className="border-t-4 border-[#E31B23] bg-[#161616] px-6 py-16 text-center">
+              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
                 <p className="text-2xl font-bold uppercase">
                   {vehicles.length === 0
                     ? "No sold vehicles yet"
@@ -343,7 +343,7 @@ export default function SoldCarsPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="chamfer mt-6 inline-flex items-center gap-2 bg-[#E31B23] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
                     <X size={15} />
                     Clear filters
@@ -360,11 +360,11 @@ export default function SoldCarsPage() {
                       <Link
                         key={car.id}
                         href={`/showroom/car/${car.id}`}
-                        className="group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#161616] transition-colors hover:border-[#E31B23] hover:bg-[#1C1C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className="group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#161616] transition-colors hover:border-[#9B1111] hover:bg-[#1C1C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
-                        <div className="relative overflow-hidden bg-[#0B0B0B] p-3">
+                        <div className="relative overflow-hidden bg-[#1C0606] p-3">
                           {/* SOLD badge */}
-                          <div className="absolute right-0 top-0 z-10 inline-flex items-center gap-1.5 bg-[#E31B23] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
+                          <div className="absolute right-0 top-0 z-10 inline-flex items-center gap-1.5 bg-[#9B1111] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
                             <BadgeCheck size={13} />
                             Sold
                           </div>
@@ -387,7 +387,7 @@ export default function SoldCarsPage() {
 
                         <div className="flex flex-1 flex-col p-5">
                           <div>
-                            <p className="text-sm font-semibold text-[#E31B23]">
+                            <p className="text-sm font-semibold text-[#9B1111]">
                               {car.year} | {car.type}
                             </p>
                             <h3 className="mt-1 text-2xl font-bold uppercase leading-tight">
@@ -405,7 +405,7 @@ export default function SoldCarsPage() {
 
                           <div className="mt-auto pt-5">
                             <div className="mb-5 grid grid-cols-2 gap-3 text-sm">
-                              <div className="min-w-0 bg-[#0B0B0B] p-3">
+                              <div className="min-w-0 bg-[#1C0606] p-3">
                                 <span className="block text-xs font-semibold text-white/50">
                                   Mileage
                                 </span>
@@ -413,7 +413,7 @@ export default function SoldCarsPage() {
                                   {car.mileage}
                                 </span>
                               </div>
-                              <div className="min-w-0 bg-[#0B0B0B] p-3">
+                              <div className="min-w-0 bg-[#1C0606] p-3">
                                 <span className="block text-xs font-semibold text-white/50">
                                   Engine
                                 </span>
@@ -427,7 +427,7 @@ export default function SoldCarsPage() {
                               <span className="flex min-w-0 items-center gap-2">
                                 <MapPin
                                   size={14}
-                                  className="shrink-0 text-[#E31B23]"
+                                  className="shrink-0 text-[#9B1111]"
                                 />
                                 <span
                                   title={car.location}
@@ -436,7 +436,7 @@ export default function SoldCarsPage() {
                                   {car.location}
                                 </span>
                               </span>
-                              <span className="inline-flex shrink-0 items-center gap-2 font-bold uppercase text-white transition-colors group-hover:text-[#E31B23]">
+                              <span className="inline-flex shrink-0 items-center gap-2 font-bold uppercase text-white transition-colors group-hover:text-[#9B1111]">
                                 View
                                 <ArrowRight
                                   size={16}
@@ -459,7 +459,7 @@ export default function SoldCarsPage() {
                         setCurrentPage((page) => Math.max(1, page - 1))
                       }
                       disabled={currentPage === 1}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#E31B23] hover:bg-[#E31B23] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
+                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
                     >
                       Previous
                     </button>
@@ -476,8 +476,8 @@ export default function SoldCarsPage() {
                             }
                             className={`flex h-10 w-10 items-center justify-center text-sm font-bold transition-colors ${
                               currentPage === page
-                                ? "bg-[#E31B23] text-white"
-                                : "border-2 border-white/20 text-white hover:border-[#E31B23] hover:text-[#E31B23]"
+                                ? "bg-[#9B1111] text-white"
+                                : "border-2 border-white/20 text-white hover:border-[#9B1111] hover:text-[#9B1111]"
                             }`}
                           >
                             {page}
@@ -492,7 +492,7 @@ export default function SoldCarsPage() {
                         setCurrentPage((page) => Math.min(totalPages, page + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#E31B23] hover:bg-[#E31B23] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
+                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
                     >
                       Next
                     </button>
@@ -504,7 +504,7 @@ export default function SoldCarsPage() {
         </section>
 
         {/* BOTTOM BAND */}
-        <section className="bg-[#E31B23] text-white">
+        <section className="bg-[#9B1111] text-white">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div>
               <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl">
@@ -519,7 +519,7 @@ export default function SoldCarsPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center gap-2 bg-[#0B0B0B] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#0B0B0B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center gap-2 bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 View Showroom
                 <ArrowRight size={16} />
@@ -527,7 +527,7 @@ export default function SoldCarsPage() {
 
               <Link
                 href="/sell-trade"
-                className="chamfer inline-flex items-center justify-center bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#0B0B0B] transition-colors hover:bg-[#0B0B0B] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#1C0606] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Sell / Trade
               </Link>

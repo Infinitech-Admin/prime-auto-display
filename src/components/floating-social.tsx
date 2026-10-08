@@ -98,7 +98,7 @@ export default function FloatingSocial({
       name: "Call Us",
       href: `tel:${phone}`,
       icon: Phone,
-      bg: "bg-[#E31B23]",
+      bg: "bg-[#9B1111]",
     });
   }
 
@@ -108,7 +108,7 @@ export default function FloatingSocial({
       className="fixed right-0 top-1/2 z-40 -translate-y-1/2"
     >
       {/* Black rail with a red edge. Buttons are square, with each brand's own color */}
-      <div className="flex flex-col items-center gap-px border-y border-l-4 border-y-white/10 border-l-[#E31B23] bg-[#0B0B0B]">
+      <div className="flex flex-col items-center gap-px border-y border-l-4 border-y-white/10 border-l-[#9B1111] bg-[#1C0606]">
         {links.map((link) => {
           const Icon = link.icon;
 
@@ -126,7 +126,7 @@ export default function FloatingSocial({
               <Icon size={18} strokeWidth={2.25} className="sm:h-5 sm:w-5" />
 
               {/* Tooltip */}
-              <span className="pointer-events-none absolute right-full mr-3 translate-x-1 whitespace-nowrap bg-[#0B0B0B] px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-white opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+              <span className="pointer-events-none absolute right-full mr-3 translate-x-1 whitespace-nowrap bg-[#1C0606] px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-white opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
                 {link.name}
               </span>
             </Link>

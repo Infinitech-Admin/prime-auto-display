@@ -1,6 +1,6 @@
 // components/layout/wordmark.tsx
 //
-// Shared Capital Jey Car Trading logo. Used by the navbar, login and register.
+// Shared Prime Auto Display Car Trading logo. Used by the navbar, login and register.
 // Place it inside an element with the `group` class for the hover effects.
 // Size it with a text-size class: everything inside scales with em.
 
@@ -21,12 +21,12 @@ export function WheelO() {
           cx="50"
           cy="50"
           r="47"
-          fill="#0B0B0B"
+          fill="#1C0606"
           stroke="#FFFFFF"
           strokeWidth="5"
         />
         {/* Tread marks */}
-        <g stroke="#E31B23" strokeWidth="5" strokeLinecap="round">
+        <g stroke="#9B1111" strokeWidth="5" strokeLinecap="round">
           {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
             <line
               key={angle}
@@ -61,7 +61,7 @@ export function WheelO() {
           ))}
         </g>
         {/* Hub */}
-        <circle cx="50" cy="50" r="9" fill="#E31B23" />
+        <circle cx="50" cy="50" r="9" fill="#9B1111" />
       </svg>
     </span>
   );
@@ -73,19 +73,19 @@ export function Wordmark({ className = "" }: { className?: string }) {
   return (
     <span
       role="img"
-      aria-label="Capital Jey Car Trading"
+      aria-label="Prime Auto Display Car Trading"
       className={`inline-flex items-center whitespace-nowrap leading-none ${className}`}
     >
       <WheelO />
       <span aria-hidden="true" className="flex flex-col items-start">
         <span className="flex items-baseline gap-[0.18em] font-[family-name:var(--font-rajdhani)] font-bold uppercase tracking-[0.04em]">
-          <span className="text-[#E31B23] transition-colors duration-300 group-hover:text-[#FF3B43]">
+          <span className="text-[#9B1111] transition-colors duration-300 group-hover:text-[#B91C1C]">
             Capital
           </span>
           <span className="text-white">Jey</span>
         </span>
         <span className="mt-[0.3em] flex w-full items-center gap-[0.5em] text-[0.3em] font-semibold uppercase tracking-[0.35em] text-white/80">
-          <span className="h-[2px] w-[1.6em] bg-[#E31B23]" />
+          <span className="h-[2px] w-[1.6em] bg-[#9B1111]" />
           Car Trading
         </span>
       </span>

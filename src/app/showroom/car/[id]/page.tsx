@@ -141,7 +141,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
   }, [safeIndex]);
 
   return (
-    <div className="overflow-hidden border-t-4 border-[#E31B23] bg-[#161616] p-3 sm:p-5">
+    <div className="overflow-hidden border-t-4 border-[#9B1111] bg-[#161616] p-3 sm:p-5">
       {/* Media */}
       <div
         role="region"
@@ -149,7 +149,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
         aria-label={`${carName} photos`}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className={`relative overflow-hidden bg-[#0B0B0B] ${focusRing}`}
+        className={`relative overflow-hidden bg-[#1C0606] ${focusRing}`}
       >
         {/* Sliding area */}
         <div
@@ -199,7 +199,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
               type="button"
               onClick={goPrevious}
               aria-label="Previous photo"
-              className={`absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#0B0B0B]/80 text-white transition-colors hover:bg-[#E31B23] active:scale-95 sm:left-4 sm:h-11 sm:w-11 ${focusRing}`}
+              className={`absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#1C0606]/80 text-white transition-colors hover:bg-[#9B1111] active:scale-95 sm:left-4 sm:h-11 sm:w-11 ${focusRing}`}
             >
               <ArrowLeft size={18} />
             </button>
@@ -209,7 +209,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
               type="button"
               onClick={goNext}
               aria-label="Next photo"
-              className={`absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#0B0B0B]/80 text-white transition-colors hover:bg-[#E31B23] active:scale-95 sm:right-4 sm:h-11 sm:w-11 ${focusRing}`}
+              className={`absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#1C0606]/80 text-white transition-colors hover:bg-[#9B1111] active:scale-95 sm:right-4 sm:h-11 sm:w-11 ${focusRing}`}
             >
               <ArrowRight size={18} />
             </button>
@@ -217,13 +217,13 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
         )}
 
         {/* COUNTER */}
-        <div className="pointer-events-none absolute bottom-0 right-0 z-20 bg-[#E31B23] px-3 py-1.5 text-xs font-bold text-white">
+        <div className="pointer-events-none absolute bottom-0 right-0 z-20 bg-[#9B1111] px-3 py-1.5 text-xs font-bold text-white">
           {safeIndex + 1} / {slides.length}
         </div>
 
         {/* Swipe hint */}
         {safeIndex === 0 && slides.length > 1 && (
-          <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 bg-[#0B0B0B]/80 px-3 py-1.5 text-xs font-semibold text-white/80 sm:block">
+          <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 bg-[#1C0606]/80 px-3 py-1.5 text-xs font-semibold text-white/80 sm:block">
             Swipe to explore
           </div>
         )}
@@ -248,7 +248,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
                 onClick={() => setIndex(i)}
                 aria-label={`Show photo ${i + 1}`}
                 aria-current={isActive}
-                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#0B0B0B] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#E31B23] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
+                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#1C0606] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#9B1111] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
               >
                 <Image
                   src={slide.src}
@@ -289,22 +289,22 @@ function VideoSection({
   return (
     <section
       aria-label={`${carName} videos`}
-      className="border-t-4 border-[#E31B23] bg-[#161616] p-3 sm:p-5"
+      className="border-t-4 border-[#9B1111] bg-[#161616] p-3 sm:p-5"
     >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-3 px-1 sm:mb-5">
         <h2 className="flex items-center gap-3 text-xl font-bold uppercase">
-          <Video className="text-[#E31B23]" size={20} />
+          <Video className="text-[#9B1111]" size={20} />
           Videos
         </h2>
 
-        <span className="bg-[#0B0B0B] px-3 py-1.5 text-xs font-bold text-white">
+        <span className="bg-[#1C0606] px-3 py-1.5 text-xs font-bold text-white">
           {videos.length} {videos.length === 1 ? "video" : "videos"}
         </span>
       </div>
 
       {/* Player */}
-      <div className="relative overflow-hidden bg-[#0B0B0B]">
+      <div className="relative overflow-hidden bg-[#1C0606]">
         <div className="relative aspect-video w-full">
           {/* key forces a fresh <video> whenever the selection changes */}
           <video
@@ -318,11 +318,11 @@ function VideoSection({
             playsInline
             preload="metadata"
             aria-label={active.alt}
-            className="h-full w-full bg-[#0B0B0B] object-cover"
+            className="h-full w-full bg-[#1C0606] object-cover"
           />
 
           {active.duration && (
-            <span className="pointer-events-none absolute left-0 top-0 z-20 bg-[#E31B23] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
+            <span className="pointer-events-none absolute left-0 top-0 z-20 bg-[#9B1111] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
               {isLong ? "Full walkthrough" : "Clip"} · {active.duration}
             </span>
           )}
@@ -343,7 +343,7 @@ function VideoSection({
                 onClick={() => setIndex(i)}
                 aria-label={`Play video ${i + 1}`}
                 aria-current={isActive}
-                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#0B0B0B] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#E31B23] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
+                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#1C0606] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#9B1111] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
               >
                 {/* Logo fallback (kita kung walang poster / hindi pa loaded ang video frame) */}
                 <Image
@@ -377,7 +377,7 @@ function VideoSection({
                   />
                 )}
 
-                <span className="absolute inset-0 z-10 flex items-center justify-center bg-[#0B0B0B]/40">
+                <span className="absolute inset-0 z-10 flex items-center justify-center bg-[#1C0606]/40">
                   <Play size={16} className="fill-white text-white" />
                 </span>
               </button>
@@ -503,9 +503,9 @@ export default function CarDetailsPage() {
     return (
       <>
         <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#0B0B0B] px-4 text-white">
-          <div className="w-full max-w-md border-t-4 border-[#E31B23] bg-[#161616] px-6 py-12 text-center">
-            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#E31B23]" />
+        <main className="flex min-h-screen items-center justify-center bg-[#1C0606] px-4 text-white">
+          <div className="w-full max-w-md border-t-4 border-[#9B1111] bg-[#161616] px-6 py-12 text-center">
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
             <p className="mt-6 text-2xl font-bold uppercase">Loading vehicle</p>
             <p className="mt-2 text-sm text-white/60">
               Preparing the latest details for you.
@@ -521,9 +521,9 @@ export default function CarDetailsPage() {
     return (
       <>
         <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#0B0B0B] px-4 text-white">
-          <div className="w-full max-w-lg border-t-4 border-[#E31B23] bg-[#161616] px-6 py-12 text-center">
-            <p className="text-sm font-bold text-[#E31B23]">
+        <main className="flex min-h-screen items-center justify-center bg-[#1C0606] px-4 text-white">
+          <div className="w-full max-w-lg border-t-4 border-[#9B1111] bg-[#161616] px-6 py-12 text-center">
+            <p className="text-sm font-bold text-[#9B1111]">
               Vehicle unavailable
             </p>
             <h1 className="mt-4 text-3xl font-bold uppercase leading-tight">
@@ -536,14 +536,14 @@ export default function CarDetailsPage() {
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center bg-[#E31B23] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#E31B23] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 Browse showroom
               </Link>
               <button
                 type="button"
                 onClick={() => setReloadKey((k) => k + 1)}
-                className="chamfer inline-flex items-center justify-center gap-2 bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#0B0B0B] transition-colors hover:bg-[#E31B23] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center gap-2 bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#9B1111] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <RotateCcw size={16} />
                 Retry
@@ -586,12 +586,12 @@ export default function CarDetailsPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0B0B0B] text-white">
+      <main className="min-h-screen bg-[#1C0606] text-white">
         {/* HEADER STRIP */}
-        <section className="relative overflow-hidden bg-[#0B0B0B]">
+        <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#E31B23] lg:block"
+            className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#9B1111] lg:block"
           />
           <div
             aria-hidden="true"
@@ -601,9 +601,9 @@ export default function CarDetailsPage() {
           <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <Link
               href="/showroom"
-              className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:text-[#E31B23] ${focusRing}`}
+              className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:text-[#9B1111] ${focusRing}`}
             >
-              <ArrowLeft size={16} className="text-[#E31B23]" />
+              <ArrowLeft size={16} className="text-[#9B1111]" />
               Back to showroom
             </Link>
           </div>
@@ -619,7 +619,7 @@ export default function CarDetailsPage() {
                 {slides.length > 0 ? (
                   <CarGallery key={car.id} carName={car.name} slides={slides} />
                 ) : (
-                  <div className="flex h-[300px] items-center justify-center border-t-4 border-[#E31B23] bg-[#161616] text-sm text-white/50 sm:h-[420px] lg:h-[560px]">
+                  <div className="flex h-[300px] items-center justify-center border-t-4 border-[#9B1111] bg-[#161616] text-sm text-white/50 sm:h-[420px] lg:h-[560px]">
                     No photos available yet
                   </div>
                 )}
@@ -636,11 +636,11 @@ export default function CarDetailsPage() {
               {/* Right column: spans both rows so sticky works the whole way down */}
               <div className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:space-y-8">
                 {/* Vehicle Info */}
-                <aside className="border-t-4 border-[#E31B23] bg-[#161616] p-5 sm:p-6">
+                <aside className="border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-6">
                   {/* Badge */}
                   <div className="mb-4 flex items-center justify-between gap-3">
                     {car.badge ? (
-                      <span className="bg-[#E31B23] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                      <span className="bg-[#9B1111] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
                         {car.badge}
                       </span>
                     ) : (
@@ -651,14 +651,14 @@ export default function CarDetailsPage() {
                       <Star
                         size={14}
                         fill="currentColor"
-                        className="text-[#E31B23]"
+                        className="text-[#9B1111]"
                       />
                       Featured
                     </span>
                   </div>
 
                   {/* Vehicle Type */}
-                  <p className="text-sm font-semibold text-[#E31B23]">
+                  <p className="text-sm font-semibold text-[#9B1111]">
                     {car.year} | {car.type}
                   </p>
 
@@ -697,7 +697,7 @@ export default function CarDetailsPage() {
                     type="button"
                     disabled={unavailable}
                     onClick={handleAddToCart}
-                    className={`chamfer mt-6 flex w-full items-center justify-center gap-2 bg-[#E31B23] px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#E31B23] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 disabled:hover:bg-white/10 disabled:hover:text-white/40 ${focusRing}`}
+                    className={`chamfer mt-6 flex w-full items-center justify-center gap-2 bg-[#9B1111] px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 disabled:hover:bg-white/10 disabled:hover:text-white/40 ${focusRing}`}
                   >
                     {unavailable
                       ? statusLabel
@@ -712,14 +712,14 @@ export default function CarDetailsPage() {
                       type="button"
                       disabled={car.status === "sold"}
                       onClick={() => setTestDriveOpen(true)}
-                      className={`chamfer inline-flex items-center justify-center bg-white px-5 py-4 text-sm font-bold uppercase tracking-wider text-[#0B0B0B] transition-colors hover:bg-[#E31B23] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`}
+                      className={`chamfer inline-flex items-center justify-center bg-white px-5 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#9B1111] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`}
                     >
                       Book a test drive
                     </button>
 
                     <Link
                       href="/showroom"
-                      className={`inline-flex items-center justify-center border-2 border-white/25 px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#E31B23] hover:bg-[#E31B23] ${focusRing}`}
+                      className={`inline-flex items-center justify-center border-2 border-white/25 px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] ${focusRing}`}
                     >
                       Browse more cars
                     </Link>
@@ -736,9 +736,9 @@ export default function CarDetailsPage() {
               </div>
 
               {/* Highlights: sits under the media, filling the left column */}
-              <section className="min-w-0 border-t-4 border-[#E31B23] bg-[#161616] p-5 sm:p-8 lg:col-start-1 lg:row-start-2">
+              <section className="min-w-0 border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-8 lg:col-start-1 lg:row-start-2">
                 <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <Sparkles className="text-[#E31B23]" size={22} />
+                  <Sparkles className="text-[#9B1111]" size={22} />
                   Vehicle highlights
                 </h2>
 
@@ -754,9 +754,9 @@ export default function CarDetailsPage() {
                   {highlights.map(({ icon: Icon, label, value }) => (
                     <div
                       key={label}
-                      className="border-l-4 border-[#E31B23] bg-[#0B0B0B] p-4"
+                      className="border-l-4 border-[#9B1111] bg-[#1C0606] p-4"
                     >
-                      <Icon className="text-[#E31B23]" size={18} />
+                      <Icon className="text-[#9B1111]" size={18} />
                       <p className="mt-3 text-sm text-white/55">{label}</p>
                       <p className="mt-1 break-words text-lg font-bold text-white">
                         {value}

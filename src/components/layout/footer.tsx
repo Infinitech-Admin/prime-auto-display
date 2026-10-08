@@ -6,7 +6,7 @@ import { Wordmark } from "@/components/layout/wordmark";
 // Business details
 // Anything left empty is hidden automatically instead of showing placeholders.
 // ---------------------------------------------------------------------------
-const BUSINESS_NAME = "Capital Jey Car Trading";
+const BUSINESS_NAME = "Prime Auto Display Car Trading";
 const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
 const INSTAGRAM_URL = "https://www.instagram.com/capitaljautofocus";
 const ADDRESS_LINE_1 = "Blk 28, Lot 26 Vatican City Drive,";
@@ -47,8 +47,8 @@ const InstagramIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Capital Jey Car Trading palette
-// black #0B0B0B | red #E31B23 | red hover #FF3B43 | white #FFFFFF
+// Prime Auto Display Car Trading palette
+// black #1C0606 | red #9B1111 | red hover #B91C1C | white #FFFFFF
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
@@ -59,11 +59,11 @@ const socialLink =
 const footerLink = "text-white/60 transition-colors hover:text-white";
 
 const headingClass =
-  "text-lg font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-[3px] after:w-8 after:bg-[#E31B23]";
+  "text-lg font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-[3px] after:w-8 after:bg-[#9B1111]";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0B0B0B] text-white">
+    <footer className="bg-[#1C0606] text-white">
       {/* Tire-tread divider, same as the home hero */}
       <div aria-hidden="true" className="tread" />
 
@@ -175,7 +175,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className={`flex gap-3 ${footerLink}`}
               >
-                <MapPin className="mt-0.5 size-4 shrink-0 text-[#E31B23]" />
+                <MapPin className="mt-0.5 size-4 shrink-0 text-[#9B1111]" />
                 <address className="not-italic">
                   {ADDRESS_LINE_1}
                   <br />
@@ -188,7 +188,7 @@ export default function Footer() {
                   href={`tel:${PHONE_TEL}`}
                   className={`flex items-center gap-3 ${footerLink}`}
                 >
-                  <Phone className="size-4 text-[#E31B23]" />
+                  <Phone className="size-4 text-[#9B1111]" />
                   {PHONE_DISPLAY}
                 </a>
               ) : null}
@@ -198,7 +198,7 @@ export default function Footer() {
                   href={`mailto:${EMAIL}`}
                   className={`flex items-center gap-3 ${footerLink}`}
                 >
-                  <Mail className="size-4 text-[#E31B23]" />
+                  <Mail className="size-4 text-[#9B1111]" />
                   {EMAIL}
                 </a>
               ) : null}
