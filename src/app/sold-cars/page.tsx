@@ -1,4 +1,5 @@
 // Path: app/sold-cars/page.tsx
+
 "use client";
 
 import Image from "next/image";
@@ -26,16 +27,32 @@ import {
   type Vehicle,
 } from "@/lib/api";
 
+/*
+  Prime Auto Display palette
+  dark #1C0606 | page #150404 | panel #2A0A0A | input #2E0C0C
+  maroon #9B1111 | gold #F9A602 | cream #FDF5DC | card #FFFBEF
+*/
+
 const DEFAULT_LOAD_ERROR =
   "We couldn’t load our sold vehicles right now. Please refresh the page or contact our team for assistance.";
 
 // Set to false if you don't want to show prices on sold cars.
 const SHOW_PRICE = true;
-
 const CARS_PER_PAGE = 12;
 
+const ringDark =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+const ringLight =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]";
+
 const fieldClass =
-  "h-12 w-full border-2 border-white/10 bg-[#1A1A1A] px-4 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#9B1111] focus:bg-[#202020]";
+  "h-12 w-full border-2 border-[#FDF5DC]/15 bg-[#2E0C0C] px-4 text-sm text-[#FDF5DC] placeholder:text-[#FDF5DC]/40 outline-none transition-colors focus:border-[#F9A602] focus:bg-[#3A1212]";
+
+const stateBox =
+  "border-t-4 border-[#9B1111] bg-[#FFFBEF] px-6 py-16 text-center";
+const stateBtn = `chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606] ${ringLight}`;
+const pageBtn =
+  "inline-flex h-10 items-center justify-center border-2 border-[#1C0606]/25 px-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#1C0606]/25 disabled:hover:bg-transparent disabled:hover:text-[#1C0606]";
 
 export default function SoldCarsPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -49,7 +66,6 @@ export default function SoldCarsPage() {
   const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setLoadError(null);
-
     try {
       const { data } = await fetchSoldVehicles({ signal });
       setVehicles(data ?? []); // API already returns sold cars only
@@ -74,17 +90,15 @@ export default function SoldCarsPage() {
 
   const filteredCars = useMemo(() => {
     const q = search.trim().toLowerCase();
-
     const filtered = vehicles.filter((car) => {
       const matchesSearch =
         q.length === 0 ||
-        [car.name, car.type, car.location].some((value) =>
-          (value ?? "").toLowerCase().includes(q),
+        [car.name, car.type, car.location].some((v) =>
+          (v ?? "").toLowerCase().includes(q),
         );
-      const matchesModel =
-        selectedModel === "all" || car.name === selectedModel;
-
-      return matchesSearch && matchesModel;
+      return (
+        matchesSearch && (selectedModel === "all" || car.name === selectedModel)
+      );
     });
 
     return [...filtered].sort((a, b) => {
@@ -133,7 +147,7 @@ export default function SoldCarsPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#1C0606] text-white">
+      <main className="min-h-screen bg-[#1C0606] text-[#FDF5DC]">
         {/* HEADER */}
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
@@ -142,50 +156,49 @@ export default function SoldCarsPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
 
           <div className="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-8 lg:py-24 xl:pr-40 2xl:pr-8">
             <div className="lg:min-w-0 lg:flex-1">
-              <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
-                Cars we&apos;ve
-                <span className="block text-[#F9A602]">found homes.</span>
-              </h1>
-
-              <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                A look at the vehicles we&apos;ve successfully sold. Every one
-                of them went to a happy driver, and yours could be next.
-              </p>
+              <div className="max-w-4xl border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+                <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl">
+                  Cars that found homes.
+                </h1>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-[#FDF5DC]/70 sm:text-lg">
+                  Every car here went to a happy driver. Your next ride could be
+                  on this list.
+                </p>
+              </div>
             </div>
 
-            {/* Right side: sold count + quick links */}
-            <div className="w-full border-t-4 border-[#9B1111] bg-[#161616] lg:w-[400px] lg:shrink-0">
+            <div className="w-full border-t-4 border-[#F9A602] bg-[#2A0A0A] lg:w-[400px] lg:shrink-0">
               <div className="p-6 sm:p-7">
                 <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <BadgeCheck size={22} className="text-[#9B1111]" />
+                  <BadgeCheck size={22} className="text-[#F9A602]" />
                   Sold so far
                 </h2>
 
-                <div className="mt-5 border-l-4 border-[#9B1111] bg-[#1C0606] p-5">
+                <div className="mt-5 border-l-4 border-[#F9A602] bg-[#1C0606] p-5">
                   {isLoading ? (
-                    <p className="text-sm text-white/60">Counting...</p>
+                    <p className="text-sm text-[#FDF5DC]/60">Counting...</p>
                   ) : loadError ? (
-                    <p className="text-sm text-white/60">
+                    <p className="text-sm text-[#FDF5DC]/60">
                       Count unavailable right now.
                     </p>
                   ) : (
                     <>
-                      <p className="text-6xl font-bold leading-none">
+                      <p className="text-6xl font-black leading-none text-[#F9A602]">
                         {vehicles.length}
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white/60">
+                      <p className="mt-2 text-sm font-semibold text-[#FDF5DC]/60">
                         vehicle{vehicles.length !== 1 ? "s" : ""} sold
                       </p>
                     </>
                   )}
                 </div>
 
-                <ul className="mt-5 divide-y divide-white/10 border-y border-white/10">
+                <ul className="mt-5 divide-y divide-[#FDF5DC]/10 border-y border-[#FDF5DC]/10">
                   {[
                     { label: "Browse the showroom", href: "/showroom" },
                     { label: "Sell or trade your car", href: "/sell-trade" },
@@ -194,12 +207,12 @@ export default function SoldCarsPage() {
                     <li key={item.label}>
                       <Link
                         href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className={`group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#F9A602] ${ringDark}`}
                       >
                         {item.label}
                         <ArrowRight
                           size={18}
-                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
+                          className="shrink-0 text-[#F9A602] transition-transform group-hover:translate-x-1"
                         />
                       </Link>
                     </li>
@@ -211,13 +224,13 @@ export default function SoldCarsPage() {
           <div aria-hidden="true" className="tread" />
         </section>
 
-        {/* LIST */}
-        <section className="bg-[#111111]">
+        {/* LIST: cream, same as the showroom */}
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
             {/* FILTERS */}
-            <div className="mb-10 border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-6">
+            <div className="mb-10 border-t-4 border-[#F9A602] bg-[#1C0606] p-5 text-[#FDF5DC] sm:p-6">
               <h2 className="mb-4 flex items-center gap-3 text-xl font-bold uppercase">
-                <SlidersHorizontal size={20} className="text-[#9B1111]" />
+                <SlidersHorizontal size={20} className="text-[#F9A602]" />
                 Search &amp; filter
               </h2>
 
@@ -225,11 +238,11 @@ export default function SoldCarsPage() {
                 <label className="relative block">
                   <Search
                     size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9B1111]"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#F9A602]"
                   />
                   <input
                     value={search}
-                    onChange={(event) => setSearch(event.target.value)}
+                    onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search model, type, or city"
                     className={`${fieldClass} pl-11`}
                   />
@@ -238,14 +251,14 @@ export default function SoldCarsPage() {
                 <div className="relative">
                   <select
                     value={selectedModel}
-                    onChange={(event) => setSelectedModel(event.target.value)}
+                    onChange={(e) => setSelectedModel(e.target.value)}
                     className={`${fieldClass} appearance-none pr-10`}
                   >
                     {modelOptions.map((model) => (
                       <option
                         key={model}
                         value={model}
-                        className="bg-[#1A1A1A]"
+                        className="bg-[#2E0C0C]"
                       >
                         {model === "all" ? "All models" : model}
                       </option>
@@ -253,28 +266,28 @@ export default function SoldCarsPage() {
                   </select>
                   <ChevronDown
                     size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#F9A602]"
                   />
                 </div>
 
                 <div className="relative">
                   <select
                     value={sortOrder}
-                    onChange={(event) => setSortOrder(event.target.value)}
+                    onChange={(e) => setSortOrder(e.target.value)}
                     className={`${fieldClass} appearance-none pr-10`}
                   >
-                    <option value="newest" className="bg-[#1A1A1A]">
+                    <option value="newest" className="bg-[#2E0C0C]">
                       Newest first
                     </option>
-                    <option value="oldest" className="bg-[#1A1A1A]">
+                    <option value="oldest" className="bg-[#2E0C0C]">
                       Oldest first
                     </option>
                     {SHOW_PRICE && (
                       <>
-                        <option value="price-low" className="bg-[#1A1A1A]">
+                        <option value="price-low" className="bg-[#2E0C0C]">
                           Price: low to high
                         </option>
-                        <option value="price-high" className="bg-[#1A1A1A]">
+                        <option value="price-high" className="bg-[#2E0C0C]">
                           Price: high to low
                         </option>
                       </>
@@ -282,7 +295,7 @@ export default function SoldCarsPage() {
                   </select>
                   <ChevronDown
                     size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#F9A602]"
                   />
                 </div>
 
@@ -290,7 +303,7 @@ export default function SoldCarsPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="inline-flex h-12 items-center justify-center gap-2 border-2 border-white/20 px-5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className={`inline-flex h-12 items-center justify-center gap-2 border-2 border-[#FDF5DC]/25 px-5 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:bg-[#9B1111] ${ringDark}`}
                   >
                     <X size={15} />
                     Clear
@@ -301,49 +314,46 @@ export default function SoldCarsPage() {
 
             {/* CONTENT */}
             {isLoading ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
+              <div className={stateBox}>
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#1C0606]/15 border-t-[#9B1111]" />
                 <p className="mt-6 text-2xl font-bold uppercase">
-                  Loading portfolio...
-                </p>
-                <p className="mt-2 text-sm text-white/60">
-                  Gathering our sold vehicles.
+                  Loading sold cars...
                 </p>
               </div>
             ) : loadError ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
+              <div className={stateBox}>
                 <p className="text-2xl font-bold uppercase">
-                  Something went wrong
+                  Couldn&apos;t load sold cars
                 </p>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/70">
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#1C0606]/70">
                   {loadError}
                 </p>
                 <button
                   type="button"
                   onClick={() => load()}
-                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className={stateBtn}
                 >
                   <RotateCcw size={16} />
-                  Retry
+                  Try again
                 </button>
               </div>
             ) : filteredCars.length === 0 ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
+              <div className={stateBox}>
                 <p className="text-2xl font-bold uppercase">
                   {vehicles.length === 0
-                    ? "No sold vehicles yet"
-                    : "No matching vehicles found"}
+                    ? "No sold cars yet"
+                    : "No matching cars found"}
                 </p>
-                <p className="mt-2 text-sm text-white/60">
+                <p className="mt-2 text-sm text-[#1C0606]/60">
                   {vehicles.length === 0
-                    ? "Our sold vehicles will show up here."
-                    : "Try adjusting your filters or searching for a different model."}
+                    ? "Sold cars will show up here."
+                    : "Try a different model or clear your filters."}
                 </p>
                 {vehicles.length > 0 && (
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className={stateBtn}
                   >
                     <X size={15} />
                     Clear filters
@@ -360,11 +370,10 @@ export default function SoldCarsPage() {
                       <Link
                         key={car.id}
                         href={`/showroom/car/${car.id}`}
-                        className="group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#161616] transition-colors hover:border-[#9B1111] hover:bg-[#1C1C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className={`group flex h-full flex-col overflow-hidden border border-t-4 border-[#1C0606]/10 border-t-transparent bg-[#FFFBEF] transition-colors hover:border-t-[#F9A602] ${ringLight}`}
                       >
-                        <div className="relative overflow-hidden bg-[#1C0606] p-3">
-                          {/* SOLD badge */}
-                          <div className="absolute right-0 top-0 z-10 inline-flex items-center gap-1.5 bg-[#9B1111] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
+                        <div className="relative overflow-hidden bg-[#F5E9C8] p-3">
+                          <div className="absolute right-0 top-0 z-10 inline-flex items-center gap-1.5 bg-[#1C0606] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#F9A602]">
                             <BadgeCheck size={13} />
                             Sold
                           </div>
@@ -379,7 +388,7 @@ export default function SoldCarsPage() {
                               className="h-52 w-full object-contain opacity-80 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
                             />
                           ) : (
-                            <div className="flex h-52 w-full items-center justify-center text-sm text-white/40">
+                            <div className="flex h-52 w-full items-center justify-center text-sm text-[#1C0606]/40">
                               No image available
                             </div>
                           )}
@@ -394,8 +403,8 @@ export default function SoldCarsPage() {
                               {car.name}
                             </h3>
                             {SHOW_PRICE && (
-                              <span className="mt-2 block text-base font-bold text-white/60">
-                                <span className="mr-1.5 text-xs font-semibold text-white/45">
+                              <span className="mt-2 block text-lg font-black text-[#1C0606]/65">
+                                <span className="mr-1.5 text-xs font-semibold text-[#1C0606]/55">
                                   Sold at
                                 </span>
                                 {car.price}
@@ -405,25 +414,25 @@ export default function SoldCarsPage() {
 
                           <div className="mt-auto pt-5">
                             <div className="mb-5 grid grid-cols-2 gap-3 text-sm">
-                              <div className="min-w-0 bg-[#1C0606] p-3">
-                                <span className="block text-xs font-semibold text-white/50">
+                              <div className="min-w-0 bg-[#FDF5DC] p-3">
+                                <span className="block text-xs font-semibold text-[#1C0606]/55">
                                   Mileage
                                 </span>
-                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5 text-white">
+                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5">
                                   {car.mileage}
                                 </span>
                               </div>
-                              <div className="min-w-0 bg-[#1C0606] p-3">
-                                <span className="block text-xs font-semibold text-white/50">
+                              <div className="min-w-0 bg-[#FDF5DC] p-3">
+                                <span className="block text-xs font-semibold text-[#1C0606]/55">
                                   Engine
                                 </span>
-                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5 text-white">
+                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5">
                                   {car.engine}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="flex min-h-14 items-center justify-between gap-3 border-t border-white/10 pt-3 text-sm text-white/70">
+                            <div className="flex min-h-14 items-center justify-between gap-3 border-t border-[#1C0606]/10 pt-3 text-sm text-[#1C0606]/70">
                               <span className="flex min-w-0 items-center gap-2">
                                 <MapPin
                                   size={14}
@@ -436,8 +445,8 @@ export default function SoldCarsPage() {
                                   {car.location}
                                 </span>
                               </span>
-                              <span className="inline-flex shrink-0 items-center gap-2 font-bold uppercase text-white transition-colors group-hover:text-[#9B1111]">
-                                View
+                              <span className="inline-flex shrink-0 items-center gap-2 font-bold uppercase text-[#1C0606] transition-colors group-hover:text-[#9B1111]">
+                                Details
                                 <ArrowRight
                                   size={16}
                                   className="transition-transform duration-300 group-hover:translate-x-1"
@@ -455,15 +464,12 @@ export default function SoldCarsPage() {
                   <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
                     <button
                       type="button"
-                      onClick={() =>
-                        setCurrentPage((page) => Math.max(1, page - 1))
-                      }
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
+                      className={`${pageBtn} ${ringLight}`}
                     >
                       Previous
                     </button>
-
                     <div className="flex flex-wrap items-center justify-center gap-2">
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                         (page) => (
@@ -474,10 +480,10 @@ export default function SoldCarsPage() {
                             aria-current={
                               currentPage === page ? "page" : undefined
                             }
-                            className={`flex h-10 w-10 items-center justify-center text-sm font-bold transition-colors ${
+                            className={`flex h-10 w-10 items-center justify-center text-sm font-bold transition-colors ${ringLight} ${
                               currentPage === page
                                 ? "bg-[#9B1111] text-white"
-                                : "border-2 border-white/20 text-white hover:border-[#9B1111] hover:text-[#9B1111]"
+                                : "border-2 border-[#1C0606]/25 hover:border-[#9B1111] hover:text-[#9B1111]"
                             }`}
                           >
                             {page}
@@ -485,14 +491,13 @@ export default function SoldCarsPage() {
                         ),
                       )}
                     </div>
-
                     <button
                       type="button"
                       onClick={() =>
-                        setCurrentPage((page) => Math.min(totalPages, page + 1))
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
+                      className={`${pageBtn} ${ringLight}`}
                     >
                       Next
                     </button>
@@ -504,30 +509,28 @@ export default function SoldCarsPage() {
         </section>
 
         {/* BOTTOM BAND */}
-        <section className="bg-[#9B1111] text-white">
+        <section className="bg-[#1C0606]">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <div>
-              <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl">
+            <div className="border-l-8 border-[#F9A602] pl-5">
+              <h2 className="text-4xl font-black uppercase leading-none sm:text-5xl">
                 Looking for your next ride?
               </h2>
-              <p className="mt-3 max-w-xl text-base leading-7 text-white/90">
+              <p className="mt-3 max-w-xl text-base leading-7 text-[#FDF5DC]/75">
                 Browse what&apos;s available now, or sell or trade in your
                 current car.
               </p>
             </div>
-
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center gap-2 bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className={`chamfer inline-flex items-center justify-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ringDark}`}
               >
                 View Showroom
                 <ArrowRight size={16} />
               </Link>
-
               <Link
                 href="/sell-trade"
-                className="chamfer inline-flex items-center justify-center bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#1C0606] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className={`chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C] ${ringDark}`}
               >
                 Sell / Trade
               </Link>

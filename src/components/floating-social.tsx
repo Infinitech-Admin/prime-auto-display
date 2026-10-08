@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
-const INSTAGRAM_URL = "https://www.instagram.com/capitaljautofocus";
-const PHONE_NUMBER = "+639972530052"; // 0997 253 0052
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61553420834178";
+const TIKTOK_URL = "https://www.tiktok.com/@prime.autodisplay";
+const PHONE_NUMBER = "+639459756255"; // 0945 975 6255
+const EMAIL = "shirleyprimesdisplay@yahoo.com";
 
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
@@ -32,31 +33,26 @@ function FacebookIcon({ size = 18, className }: BrandIconProps) {
   );
 }
 
-function InstagramIcon({ size = 18, className }: BrandIconProps) {
+function TikTokIcon({ size = 18, className }: BrandIconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       width={size}
       height={size}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fill="currentColor"
       aria-hidden="true"
       className={className}
     >
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
     </svg>
   );
 }
 
 export interface FloatingSocialProps {
   facebookHref?: string;
-  instagramHref?: string;
+  tiktokHref?: string;
   phone?: string;
+  email?: string;
 }
 
 interface SocialLink {
@@ -68,8 +64,9 @@ interface SocialLink {
 
 export default function FloatingSocial({
   facebookHref = FACEBOOK_URL,
-  instagramHref = INSTAGRAM_URL,
+  tiktokHref = TIKTOK_URL,
   phone = PHONE_NUMBER,
+  email = EMAIL,
 }: FloatingSocialProps) {
   const pathname = usePathname() ?? "";
 
@@ -86,10 +83,10 @@ export default function FloatingSocial({
       bg: "bg-[#1877F2]",
     },
     {
-      name: "Instagram",
-      href: instagramHref,
-      icon: InstagramIcon,
-      bg: "bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]",
+      name: "TikTok",
+      href: tiktokHref,
+      icon: TikTokIcon,
+      bg: "bg-black",
     },
   ];
 
@@ -98,6 +95,15 @@ export default function FloatingSocial({
       name: "Call Us",
       href: `tel:${phone}`,
       icon: Phone,
+      bg: "bg-[#9B1111]",
+    });
+  }
+
+  if (email) {
+    links.push({
+      name: "Email Us",
+      href: `mailto:${email}`,
+      icon: Mail,
       bg: "bg-[#9B1111]",
     });
   }

@@ -17,18 +17,26 @@ import {
 import Navbar from "../../components/layout/navbar";
 import Footer from "../../components/layout/footer";
 
+/*
+  Prime Auto Display palette
+  dark #1C0606 | page #150404 | panel #2A0A0A | input #2E0C0C (focus #3A1212)
+  maroon #9B1111 | gold #F9A602 | cream #FDF5DC | card #FFFBEF
+*/
+
 // ---------------------------------------------------------------------------
 // Business details
 // Anything left empty is hidden automatically instead of showing placeholders.
 // TODO: fill in HOURS when you have the schedule.
+// TODO: confirm the address is still correct for Prime Auto Display.
 // ---------------------------------------------------------------------------
-const BUSINESS_NAME = "Prime Auto Display Car Trading";
-const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
+const BUSINESS_NAME = "Prime Auto Display";
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61553420834178";
+const TIKTOK_URL = "https://www.tiktok.com/@prime.autodisplay";
 const ADDRESS_LINE_1 = "Blk 28, Lot 26 Vatican City Drive,";
 const ADDRESS_LINE_2 = "BF Resort Village, Talon Dos, Las Piñas City 1747";
-const PHONE_DISPLAY = "0997 253 0052";
-const PHONE_TEL = "+639972530052";
-const EMAIL = "capitaljeycartrading@gmail.com";
+const PHONE_DISPLAY = "0945 975 6255";
+const PHONE_TEL = "+639459756255";
+const EMAIL = "shirleyprimesdisplay@yahoo.com";
 const HOURS: { day: string; time: string }[] = [
   // { day: "Monday - Saturday", time: "9:00 AM - 6:00 PM" },
 ];
@@ -117,9 +125,14 @@ const NAME_PATTERN = new RegExp("^[\\p{L}\\p{M}\\s.'’-]+$", "u");
 // PH mobile number: exactly 11 digits, starts with 09
 const PHONE_PATTERN = /^09\d{9}$/;
 
-// Dark inputs on a dark surface. Red border on focus / error.
+const ringDark =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+const ringLight =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]";
+
+// Dark inputs on a dark card. Gold border on focus, red on error.
 const inputClass =
-  "w-full border-2 border-white/10 bg-[#1A1A1A] px-4 py-3.5 text-white placeholder:text-white/35 transition-colors focus:border-[#9B1111] focus:bg-[#202020] focus:outline-none aria-[invalid=true]:border-[#9B1111]";
+  "w-full border-2 border-[#FDF5DC]/15 bg-[#2E0C0C] px-4 py-3.5 text-[#FDF5DC] placeholder:text-[#FDF5DC]/35 transition-colors focus:border-[#F9A602] focus:bg-[#3A1212] focus:outline-none aria-[invalid=true]:border-[#FF5A61]";
 
 // Label + input + error message
 function Field({
@@ -135,10 +148,10 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 flex items-center gap-1 text-sm font-semibold text-white">
+      <span className="mb-2 flex items-center gap-1 text-sm font-semibold text-[#FDF5DC]">
         {label}
         {required ? (
-          <span className="text-[#9B1111]" aria-label="required">
+          <span className="text-[#F9A602]" aria-label="required">
             *
           </span>
         ) : null}
@@ -303,8 +316,8 @@ export default function Contact() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-[#1C0606] text-white">
-        {/* HEADER: black, oversized type, red slash on the right */}
+      <main className="min-h-screen bg-[#1C0606] text-[#FDF5DC]">
+        {/* HEADER */}
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
@@ -312,32 +325,33 @@ export default function Contact() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
 
           <div className="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-8 lg:py-24 xl:pr-40 2xl:pr-8">
             <div className="lg:min-w-0 lg:flex-1">
-              <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
-                Let&apos;s talk
-                <span className="block text-[#F9A602]">cars.</span>
-              </h1>
+              <div className="max-w-4xl border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+                <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl">
+                  Let&apos;s talk cars.
+                </h1>
 
-              <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                Tell us what you&apos;re looking for, and our team will guide
-                you toward a vehicle that fits your life, your budget, and your
-                driving style. Buying, selling, or trading in, we&apos;re happy
-                to help.
-              </p>
+                <p className="mt-6 max-w-2xl text-base leading-7 text-[#FDF5DC]/70 sm:text-lg">
+                  Tell us what you&apos;re looking for, and our team will guide
+                  you toward a vehicle that fits your life, your budget, and
+                  your driving style. Buying, selling, or trading in, we&apos;re
+                  happy to help.
+                </p>
+              </div>
             </div>
 
             {/* Right side: what you can do + direct line */}
-            <div className="border-t-4 border-[#9B1111] bg-[#161616]">
+            <div className="w-full border-t-4 border-[#F9A602] bg-[#2A0A0A] lg:w-[400px] lg:shrink-0">
               <div className="p-6 sm:p-7">
                 <h2 className="text-2xl font-bold uppercase">
                   How can we help?
                 </h2>
 
-                <ul className="mt-5 divide-y divide-white/10 border-y border-white/10">
+                <ul className="mt-5 divide-y divide-[#FDF5DC]/10 border-y border-[#FDF5DC]/10">
                   {[
                     {
                       label: "Buy a car",
@@ -358,19 +372,19 @@ export default function Contact() {
                     <li key={item.label}>
                       <Link
                         href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                        className={`group flex items-center justify-between gap-4 py-4 transition-colors hover:text-[#F9A602] ${ringDark}`}
                       >
                         <span>
                           <span className="block text-lg font-bold uppercase leading-tight">
                             {item.label}
                           </span>
-                          <span className="mt-0.5 block text-sm text-white/55">
+                          <span className="mt-0.5 block text-sm text-[#FDF5DC]/55">
                             {item.note}
                           </span>
                         </span>
                         <ArrowRight
                           size={20}
-                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
+                          className="shrink-0 text-[#F9A602] transition-transform group-hover:translate-x-1"
                         />
                       </Link>
                     </li>
@@ -380,14 +394,14 @@ export default function Contact() {
                 {PHONE_DISPLAY && PHONE_TEL ? (
                   <a
                     href={`tel:${PHONE_TEL}`}
-                    className="mt-6 flex items-center gap-4 bg-[#9B1111] px-5 py-4 text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    className={`mt-6 flex items-center gap-4 bg-[#F9A602] px-5 py-4 text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ringDark}`}
                   >
                     <Phone size={22} className="shrink-0" />
                     <span>
                       <span className="block text-xs font-semibold opacity-80">
                         Call or text us
                       </span>
-                      <span className="block text-2xl font-bold leading-none">
+                      <span className="block text-2xl font-black leading-none">
                         {PHONE_DISPLAY}
                       </span>
                     </span>
@@ -398,11 +412,11 @@ export default function Contact() {
                   href={MAPS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 flex items-start gap-3 text-sm text-white/70 transition-colors hover:text-white"
+                  className="mt-5 flex items-start gap-3 text-sm text-[#FDF5DC]/70 transition-colors hover:text-[#FDF5DC]"
                 >
                   <MapPin
                     size={18}
-                    className="mt-0.5 shrink-0 text-[#9B1111]"
+                    className="mt-0.5 shrink-0 text-[#F9A602]"
                   />
                   <span>
                     {ADDRESS_LINE_1} {ADDRESS_LINE_2}
@@ -414,9 +428,9 @@ export default function Contact() {
           <div aria-hidden="true" className="tread" />
         </section>
 
-        {/* QUICK CONTACT: solid red strip, black icon blocks */}
-        <section className="bg-[#9B1111] text-white">
-          <ul className="mx-auto grid max-w-7xl divide-black/25 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x">
+        {/* QUICK CONTACT: cream strip, dark icon blocks */}
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
+          <ul className="mx-auto grid max-w-7xl divide-[#1C0606]/10 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x">
             {contactOptions.map(({ icon: Icon, title, value, href }) => (
               <li key={title}>
                 <a
@@ -425,16 +439,16 @@ export default function Contact() {
                   rel={
                     href.startsWith("http") ? "noopener noreferrer" : undefined
                   }
-                  className="group flex h-full items-start gap-4 border-t-4 border-transparent px-5 py-6 transition-colors hover:border-white hover:bg-black/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white sm:px-6"
+                  className={`group flex h-full items-start gap-4 border-t-4 border-transparent px-5 py-6 transition-colors hover:border-[#9B1111] hover:bg-[#FFFBEF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#1C0606] sm:px-6`}
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-white transition-colors group-hover:bg-white group-hover:text-[#9B1111]">
+                  <span className="chamfer flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-[#F9A602] transition-colors group-hover:bg-[#9B1111]">
                     <Icon size={20} />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold text-white/80">
+                    <span className="block text-sm font-semibold text-[#1C0606]/65">
                       {title}
                     </span>
-                    <span className="mt-1 block break-words text-base font-bold text-white">
+                    <span className="mt-1 block break-words text-base font-bold text-[#1C0606]">
                       {value}
                     </span>
                   </span>
@@ -445,12 +459,12 @@ export default function Contact() {
         </section>
 
         {/* FORM + SIDE PANEL */}
-        <section className="bg-[#111111]">
+        <section className="bg-[#150404]">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
             <div className="grid gap-10 lg:grid-cols-[1.35fr_0.65fr] lg:gap-14">
-              <div>
-                <h2 className="flex items-center gap-3 text-3xl font-bold uppercase sm:text-4xl">
-                  <Send size={26} className="text-[#9B1111]" />
+              <div className="border-t-4 border-[#F9A602] bg-[#2A0A0A] p-6 sm:p-10">
+                <h2 className="flex items-center gap-3 text-3xl font-black uppercase sm:text-4xl">
+                  <Send size={26} className="text-[#F9A602]" />
                   Send an enquiry
                 </h2>
 
@@ -573,7 +587,7 @@ export default function Contact() {
                     </label>
                   </div>
 
-                  <label className="flex items-start gap-3 text-sm text-white/80">
+                  <label className="flex items-start gap-3 text-sm text-[#FDF5DC]/80">
                     <input
                       type="checkbox"
                       required
@@ -585,14 +599,14 @@ export default function Contact() {
                           setErrors((current) => ({ ...current, privacy: "" }));
                         }
                       }}
-                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#9B1111]"
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#F9A602]"
                     />
                     <span>
                       I agree to the{" "}
                       <button
                         type="button"
                         onClick={() => setActiveModal("privacy")}
-                        className="font-semibold text-[#9B1111] underline underline-offset-2 transition-colors hover:text-white"
+                        className="font-semibold text-[#F9A602] underline underline-offset-2 transition-colors hover:text-[#FDF5DC]"
                       >
                         Privacy Policy
                       </button>{" "}
@@ -611,8 +625,8 @@ export default function Contact() {
                       role="status"
                       className={`border-l-4 px-4 py-3 text-sm font-medium ${
                         status.type === "success"
-                          ? "border-white bg-white/10 text-white"
-                          : "border-[#9B1111] bg-[#9B1111]/15 text-[#FF8A90]"
+                          ? "border-[#F9A602] bg-[#F9A602]/10 text-[#FDF5DC]"
+                          : "border-[#FF5A61] bg-[#9B1111]/25 text-[#FFB3B7]"
                       }`}
                     >
                       {status.message}
@@ -620,14 +634,14 @@ export default function Contact() {
                   ) : null}
 
                   <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm text-white/55">
+                    <p className="text-sm text-[#FDF5DC]/55">
                       We&apos;ll get back to you as soon as we can.
                     </p>
 
                     <button
                       type="submit"
                       disabled={!acceptedPrivacy || submitting}
-                      className="chamfer inline-flex items-center justify-center gap-2 bg-[#9B1111] px-8 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+                      className={`chamfer inline-flex items-center justify-center gap-2 bg-[#F9A602] px-8 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] disabled:cursor-not-allowed disabled:bg-[#FDF5DC]/10 disabled:text-[#FDF5DC]/40 ${ringDark}`}
                     >
                       {submitting ? "Sending..." : "Send inquiry"}
                       <ArrowRight size={16} />
@@ -636,11 +650,11 @@ export default function Contact() {
                 </form>
               </div>
 
-              {/* Side panel: hours and showroom */}
+              {/* Side panel: hours, showroom and socials */}
               <aside className="lg:sticky lg:top-28 lg:self-start">
-                <div className="border-t-4 border-[#9B1111] bg-[#1A1A1A] p-6 sm:p-7">
+                <div className="border-t-4 border-[#F9A602] bg-[#2A0A0A] p-6 sm:p-7">
                   <h3 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                    <Clock3 size={22} className="text-[#9B1111]" />
+                    <Clock3 size={22} className="text-[#F9A602]" />
                     Opening hours
                   </h3>
 
@@ -649,15 +663,15 @@ export default function Contact() {
                       {HOURS.map((item) => (
                         <div
                           key={item.day}
-                          className="flex items-center justify-between gap-4 border-t border-white/10 pt-3 text-sm first:border-t-0 first:pt-0"
+                          className="flex items-center justify-between gap-4 border-t border-[#FDF5DC]/10 pt-3 text-sm first:border-t-0 first:pt-0"
                         >
-                          <span className="text-white/65">{item.day}</span>
+                          <span className="text-[#FDF5DC]/65">{item.day}</span>
                           <span className="font-semibold">{item.time}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-5 text-sm leading-6 text-white/70">
+                    <p className="mt-5 text-sm leading-6 text-[#FDF5DC]/70">
                       Message us on Facebook to confirm our hours before you
                       visit.
                     </p>
@@ -667,11 +681,11 @@ export default function Contact() {
                     href={MAPS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-6 flex items-start gap-3 border-t border-white/10 pt-5 text-sm font-medium text-white transition-colors hover:text-[#9B1111]"
+                    className="mt-6 flex items-start gap-3 border-t border-[#FDF5DC]/10 pt-5 text-sm font-medium text-[#FDF5DC] transition-colors hover:text-[#F9A602]"
                   >
                     <MapPin
                       size={18}
-                      className="mt-0.5 shrink-0 text-[#9B1111]"
+                      className="mt-0.5 shrink-0 text-[#F9A602]"
                     />
                     <span>
                       {ADDRESS_LINE_1}
@@ -679,17 +693,36 @@ export default function Contact() {
                       {ADDRESS_LINE_2}
                     </span>
                   </a>
+
+                  <div className="mt-6 flex flex-wrap gap-3 border-t border-[#FDF5DC]/10 pt-5">
+                    <a
+                      href={FACEBOOK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`border-2 border-[#FDF5DC]/25 px-4 py-2.5 text-sm font-bold text-[#FDF5DC] transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ringDark}`}
+                    >
+                      Facebook
+                    </a>
+                    <a
+                      href={TIKTOK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`border-2 border-[#FDF5DC]/25 px-4 py-2.5 text-sm font-bold text-[#FDF5DC] transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ringDark}`}
+                    >
+                      TikTok
+                    </a>
+                  </div>
                 </div>
               </aside>
             </div>
           </div>
         </section>
 
-        {/* BOTTOM BAND: white, the only light section, used as contrast */}
-        <section className="bg-white text-[#1C0606]">
+        {/* BOTTOM BAND: cream, the light contrast before the footer */}
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div className="border-l-8 border-[#9B1111] pl-5">
-              <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl">
+              <h2 className="text-4xl font-black uppercase leading-none sm:text-5xl">
                 Book your next journey
               </h2>
               <p className="mt-3 max-w-xl text-base leading-7 text-[#1C0606]/75">
@@ -701,14 +734,14 @@ export default function Contact() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]"
+                className={`chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606] ${ringLight}`}
               >
                 Visit Showroom
               </Link>
 
               <Link
                 href="/sell-trade"
-                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]"
+                className={`chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#FDF5DC] transition-colors hover:bg-[#9B1111] ${ringLight}`}
               >
                 Sell / Trade Car
               </Link>
@@ -725,9 +758,9 @@ export default function Contact() {
             role="dialog"
             aria-modal="true"
             aria-label={privacyCopy.title}
-            className="max-h-[85vh] w-full max-w-2xl overflow-hidden border-t-4 border-[#9B1111] bg-[#141414] text-white shadow-2xl"
+            className="max-h-[85vh] w-full max-w-2xl overflow-hidden border-t-4 border-[#F9A602] bg-[#2A0A0A] text-[#FDF5DC] shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
+            <div className="flex items-center justify-between border-b border-[#FDF5DC]/10 px-5 py-4 sm:px-6">
               <h3 className="text-2xl font-bold uppercase">
                 {privacyCopy.title}
               </h3>
@@ -735,13 +768,13 @@ export default function Contact() {
                 type="button"
                 aria-label="Close privacy policy"
                 onClick={() => setActiveModal(null)}
-                className="flex h-10 w-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111]"
+                className={`flex h-10 w-10 items-center justify-center border border-[#FDF5DC]/25 text-[#FDF5DC] transition-colors hover:border-[#F9A602] hover:bg-[#9B1111] ${ringDark}`}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="max-h-[70vh] overflow-y-auto px-5 py-5 text-sm leading-7 text-white/80 sm:px-6">
+            <div className="max-h-[70vh] overflow-y-auto px-5 py-5 text-sm leading-7 text-[#FDF5DC]/80 sm:px-6">
               {privacyCopy.body.map((paragraph) => (
                 <p key={paragraph} className="mb-4">
                   {paragraph}

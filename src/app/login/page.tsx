@@ -1,4 +1,4 @@
-// app/login/page.tsx
+// Path: app/login/page.tsx
 
 "use client";
 
@@ -24,13 +24,20 @@ interface LoginForm {
 }
 
 // Where each role lands after signing in.
-// Change "/" to "/dashboard" once customer accounts have their own dashboard.
 const ROLE_REDIRECTS: Record<string, string> = {
   admin: "/admin",
   user: "/",
 };
-
 const DEFAULT_REDIRECT = "/";
+
+// Only same-site paths are allowed, to avoid open redirects.
+function getSafeRedirect(): string | null {
+  if (typeof window === "undefined") return null;
+  const param = new URLSearchParams(window.location.search).get("redirect");
+  return param && param.startsWith("/") && !param.startsWith("//")
+    ? param
+    : null;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,6 +57,7 @@ export default function LoginPage() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -61,26 +69,11 @@ export default function LoginPage() {
     try {
       const data = await login(form);
 
-      // Use the role from the login response; if the API doesn't return
-      // the user there, fall back to /me (the session cookie is already set).
-      // The redirect is only for UX — /admin must still be protected on the
-      // server (middleware / layout) and in the API.
+      // Use the role from the login response; fall back to /me if missing.
+      // The redirect is UX only: /admin must still be protected on the server.
       const role = data?.user?.role ?? (await fetchMe()).user.role;
-
-      // If we were sent here from a protected page (e.g. checkout), go back
-      // there. Only same-site paths are allowed, to avoid open redirects.
-      const redirectParam = new URLSearchParams(window.location.search).get(
-        "redirect",
-      );
-      const safeRedirect =
-        redirectParam &&
-        redirectParam.startsWith("/") &&
-        !redirectParam.startsWith("//")
-          ? redirectParam
-          : null;
-
       const destination =
-        safeRedirect ?? ROLE_REDIRECTS[role] ?? DEFAULT_REDIRECT;
+        getSafeRedirect() ?? ROLE_REDIRECTS[role] ?? DEFAULT_REDIRECT;
 
       router.push(destination);
       router.refresh();
@@ -88,9 +81,8 @@ export default function LoginPage() {
       const apiErr = err as ApiError;
       if (apiErr.errors) {
         const fieldErrors: Record<string, string> = {};
-        for (const key in apiErr.errors) {
+        for (const key in apiErr.errors)
           fieldErrors[key] = apiErr.errors[key][0];
-        }
         setErrors(fieldErrors);
       } else {
         setFormError(apiErr.message || "Unable to sign in. Please try again.");
@@ -103,14 +95,14 @@ export default function LoginPage() {
   return (
     <AuthShell
       headline="Your next car is waiting."
-      blurb="Sign in to save listings, track offers and pick up where you left off."
+      blurb="Sign in to save cars, track your reservations and pick up where you left off."
     >
       <form onSubmit={handleSubmit} noValidate>
-        <h1 className="text-3xl font-bold uppercase leading-none text-white">
+        <h1 className="text-3xl font-black uppercase leading-none text-white">
           Welcome back
         </h1>
         <p className="mb-7 mt-3 text-sm text-white/60">
-          Sign in to your Prime Auto Display Car Trading account.
+          Sign in to your Prime Auto Display account.
         </p>
 
         {formError && (
@@ -164,7 +156,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#F9A602] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F9A602]"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -184,9 +176,9 @@ export default function LoginPage() {
               name="remember"
               checked={form.remember}
               onChange={handleChange}
-              className="h-4 w-4 accent-[#9B1111]"
+              className="h-4 w-4 accent-[#F9A602]"
             />
-            Remember me
+            Keep me signed in
           </label>
           {/* <Link href="/forgot-password" className={`text-sm ${authLinkClass}`}>
             Forgot password?
@@ -199,7 +191,7 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-7 border-t border-white/10 pt-6 text-center text-sm text-white/65">
-          New to Prime Auto Display Car Trading?{" "}
+          New to Prime Auto Display?{" "}
           <Link href="/register" className={authLinkClass}>
             Create an account
           </Link>

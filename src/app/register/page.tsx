@@ -1,4 +1,4 @@
-// app/register/page.tsx
+// Path: app/register/page.tsx
 
 "use client";
 
@@ -31,15 +31,7 @@ interface RegisterForm {
   password_confirmation: string;
 }
 
-interface PasswordRules {
-  length: boolean;
-  lower: boolean;
-  upper: boolean;
-  number: boolean;
-  symbol: boolean;
-}
-
-function checkRules(password: string): PasswordRules {
+function checkRules(password: string) {
   return {
     length: password.length >= 10,
     lower: /[a-z]/.test(password),
@@ -53,25 +45,33 @@ function checkRules(password: string): PasswordRules {
 const EMAIL_REGEX =
   /^(?!.*\.\.)[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
-// PH mobile format: exactly 11 digits, must start with "09" (e.g. 09171234567).
+// PH mobile format: exactly 11 digits, must start with "09".
 const PHONE_REGEX = /^09\d{9}$/;
 
 function validateEmail(email: string): string {
-  const trimmed = email.trim();
-  if (!trimmed) return "Email is required.";
-  if (trimmed.length > 254) return "Email is too long.";
-  if (!EMAIL_REGEX.test(trimmed)) return "Enter a valid email address.";
+  const t = email.trim();
+  if (!t) return "Email is required.";
+  if (t.length > 254) return "Email is too long.";
+  if (!EMAIL_REGEX.test(t)) return "Enter a valid email address.";
   return "";
 }
 
 function validatePhone(phone: string): string {
-  const trimmed = phone.trim();
-  if (!trimmed) return ""; // optional field
-  if (!PHONE_REGEX.test(trimmed)) {
-    return "Phone must be exactly 11 digits and start with 09 (e.g. 09171234567).";
+  const t = phone.trim();
+  if (!t) return ""; // optional field
+  if (!PHONE_REGEX.test(t)) {
+    return "Phone must be 11 digits and start with 09 (e.g. 09171234567).";
   }
   return "";
 }
+
+const STRENGTH = [
+  { label: "Too weak", bar: "bg-[#9B1111]" },
+  { label: "Weak", bar: "bg-[#9B1111]" },
+  { label: "Fair", bar: "bg-[#F9A602]" },
+  { label: "Good", bar: "bg-[#F9A602]" },
+  { label: "Strong", bar: "bg-[#FDF5DC]" },
+];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -88,6 +88,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const rules = useMemo(() => checkRules(form.password), [form.password]);
+  const score = Object.values(rules).filter(Boolean).length;
   const passwordsMatch =
     form.password_confirmation.length > 0 &&
     form.password === form.password_confirmation;
@@ -96,12 +97,11 @@ export default function RegisterPage() {
     const { name, value } = e.target;
 
     if (name === "phone") {
-      // Digits only, capped at 11 — keeps the field impossible to
-      // overtype past the valid PH mobile length.
-      const digitsOnly = value.replace(/\D/g, "").slice(0, 11);
-      setForm((prev) => ({ ...prev, phone: digitsOnly }));
+      // Digits only, capped at 11.
+      const digits = value.replace(/\D/g, "").slice(0, 11);
+      setForm((prev) => ({ ...prev, phone: digits }));
       if (errors.phone) {
-        setErrors((prev) => ({ ...prev, phone: validatePhone(digitsOnly) }));
+        setErrors((prev) => ({ ...prev, phone: validatePhone(digits) }));
       }
       return;
     }
@@ -109,6 +109,8 @@ export default function RegisterPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
     if (name === "email" && errors.email) {
       setErrors((prev) => ({ ...prev, email: validateEmail(value) }));
+    } else if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   }
 
@@ -128,13 +130,8 @@ export default function RegisterPage() {
 
     const emailError = validateEmail(form.email);
     const phoneError = validatePhone(form.phone);
-
     if (emailError || phoneError) {
-      setErrors((prev) => ({
-        ...prev,
-        ...(emailError ? { email: emailError } : { email: "" }),
-        ...(phoneError ? { phone: phoneError } : { phone: "" }),
-      }));
+      setErrors({ email: emailError, phone: phoneError });
       return;
     }
 
@@ -150,9 +147,8 @@ export default function RegisterPage() {
       const apiErr = err as ApiError;
       if (apiErr.errors) {
         const fieldErrors: Record<string, string> = {};
-        for (const key in apiErr.errors) {
+        for (const key in apiErr.errors)
           fieldErrors[key] = apiErr.errors[key][0];
-        }
         setErrors(fieldErrors);
       } else {
         setFormError(
@@ -167,14 +163,14 @@ export default function RegisterPage() {
   return (
     <AuthShell
       headline="Start your engine."
-      blurb="Create an account to save listings, track offers and sell or trade in your car."
+      blurb="Create an account to save cars, reserve a vehicle and sell or trade in your own."
     >
       <form onSubmit={handleSubmit} noValidate>
-        <h1 className="text-3xl font-bold uppercase leading-none text-white">
+        <h1 className="text-3xl font-black uppercase leading-none text-white">
           Create your account
         </h1>
         <p className="mb-7 mt-3 text-sm text-white/60">
-          Join Prime Auto Display Car Trading in a few quick steps.
+          It takes about a minute. We&apos;ll email you a code to verify.
         </p>
 
         {formError && (
@@ -183,7 +179,6 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Name */}
         <div className="mb-5">
           <label htmlFor="name" className={authLabelClass}>
             Full name
@@ -208,61 +203,60 @@ export default function RegisterPage() {
           )}
         </div>
 
-        {/* Phone */}
-        <div className="mb-5">
-          <label htmlFor="phone" className={authLabelClass}>
-            Phone <span className="font-normal text-white/45">(optional)</span>
-          </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            inputMode="numeric"
-            autoComplete="tel"
-            maxLength={11}
-            pattern="09\d{9}"
-            value={form.phone}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            aria-invalid={!!errors.phone}
-            aria-describedby={errors.phone ? "phone-error" : undefined}
-            className={authInputClass}
-            placeholder="09171234567"
-          />
-          {errors.phone && (
-            <p id="phone-error" className={authErrorClass}>
-              {errors.phone}
-            </p>
-          )}
+        <div className="mb-5 grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="email" className={authLabelClass}>
+              Email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              className={authInputClass}
+              placeholder="you@example.com"
+            />
+            {errors.email && (
+              <p id="email-error" className={authErrorClass}>
+                {errors.email}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="phone" className={authLabelClass}>
+              Phone{" "}
+              <span className="font-normal text-white/45">(optional)</span>
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              maxLength={11}
+              value={form.phone}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              aria-invalid={!!errors.phone}
+              aria-describedby={errors.phone ? "phone-error" : undefined}
+              className={authInputClass}
+              placeholder="09171234567"
+            />
+            {errors.phone && (
+              <p id="phone-error" className={authErrorClass}>
+                {errors.phone}
+              </p>
+            )}
+          </div>
         </div>
 
-        {/* Email */}
-        <div className="mb-5">
-          <label htmlFor="email" className={authLabelClass}>
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            className={authInputClass}
-            placeholder="you@example.com"
-          />
-          {errors.email && (
-            <p id="email-error" className={authErrorClass}>
-              {errors.email}
-            </p>
-          )}
-        </div>
-
-        {/* Password */}
         <div className="mb-5">
           <label htmlFor="password" className={authLabelClass}>
             Password
@@ -284,7 +278,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-white/60 transition-colors hover:text-[#F9A602] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F9A602]"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -297,18 +291,32 @@ export default function RegisterPage() {
           )}
 
           {form.password.length > 0 && (
-            <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 bg-[#1C0606] p-3 text-sm">
-              <RuleItem met={rules.length}>10+ characters</RuleItem>
-              <RuleItem met={rules.upper && rules.lower}>
-                Upper &amp; lowercase
-              </RuleItem>
-              <RuleItem met={rules.number}>A number</RuleItem>
-              <RuleItem met={rules.symbol}>A symbol</RuleItem>
-            </ul>
+            <div className="mt-3 bg-[#1C0606] p-3 text-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex flex-1 gap-1" aria-hidden>
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 flex-1 ${i < score ? STRENGTH[score - 1].bar : "bg-white/10"}`}
+                    />
+                  ))}
+                </div>
+                <span className="w-16 text-right text-xs font-bold text-white/80">
+                  {score === 0 ? STRENGTH[0].label : STRENGTH[score - 1].label}
+                </span>
+              </div>
+              <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                <RuleItem met={rules.length}>10+ characters</RuleItem>
+                <RuleItem met={rules.upper && rules.lower}>
+                  Upper &amp; lowercase
+                </RuleItem>
+                <RuleItem met={rules.number}>A number</RuleItem>
+                <RuleItem met={rules.symbol}>A symbol</RuleItem>
+              </ul>
+            </div>
           )}
         </div>
 
-        {/* Confirm password */}
         <div className="mb-7">
           <label htmlFor="password_confirmation" className={authLabelClass}>
             Confirm password
@@ -358,7 +366,7 @@ function RuleItem({ met, children }: { met: boolean; children: ReactNode }) {
       className={`flex items-center gap-1.5 ${met ? "font-semibold text-white" : "text-white/50"}`}
     >
       {met ? (
-        <Check size={14} aria-hidden className="text-[#9B1111]" />
+        <Check size={14} aria-hidden className="text-[#F9A602]" />
       ) : (
         <X size={14} aria-hidden />
       )}

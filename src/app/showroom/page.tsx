@@ -1,4 +1,5 @@
 // Path: app/showroom/page.tsx
+
 "use client";
 
 import Image from "next/image";
@@ -11,7 +12,6 @@ import {
   MapPin,
   RotateCcw,
   Search,
-  SlidersHorizontal,
   Sparkles,
   X,
 } from "lucide-react";
@@ -29,16 +29,64 @@ import {
   type Vehicle,
 } from "@/lib/api";
 
+/*
+  Prime Auto Display palette
+  dark #1C0606 | page #150404 | panel #2A0A0A | input #2E0C0C | maroon #9B1111
+  gold #F9A602 | cream #FDF5DC | image backdrop #F5E9C8
+*/
+
 const DEFAULT_LOAD_ERROR =
   "We couldn’t load the showroom inventory right now. Please refresh the page or contact our team for assistance.";
+const CARS_PER_PAGE = 8;
 
-const fieldClass =
-  "h-12 w-full border-2 border-white/10 bg-[#1A1A1A] px-4 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#9B1111] focus:bg-[#202020]";
+const ring =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+const fieldClass = `h-12 w-full appearance-none border-2 border-[#FDF5DC]/15 bg-[#2E0C0C] px-4 pr-10 text-sm text-[#FDF5DC] outline-none transition-colors focus:border-[#F9A602] focus:bg-[#3A1212]`;
+const stateBox =
+  "border-t-4 border-[#F9A602] bg-[#2A0A0A] px-6 py-16 text-center";
+const goldBtn = `chamfer mt-6 inline-flex items-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`;
+const pageBtn = `inline-flex h-10 items-center justify-center border-2 border-[#FDF5DC]/25 px-4 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:text-[#F9A602] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#FDF5DC]/25 disabled:hover:text-[#FDF5DC] ${ring}`;
+
+const PRICE_RANGES = [
+  { value: "all", label: "All prices" },
+  { value: "under-50k", label: "Under ₱50k" },
+  { value: "50k-70k", label: "₱50k - ₱70k" },
+  { value: "70k-plus", label: "₱70k+" },
+];
+
+function Select({
+  value,
+  onChange,
+  children,
+  label,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  children: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="relative">
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={fieldClass}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        size={18}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#F9A602]"
+      />
+    </div>
+  );
+}
 
 export default function ShowroomPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedModel, setSelectedModel] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
   const [priceRange, setPriceRange] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,12 +96,9 @@ export default function ShowroomPage() {
 
   const { addToCart } = useCart();
 
-  const carsPerPage = 8;
-
   const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setLoadError(null);
-
     try {
       const { data } = await fetchVehicles({ signal });
       setVehicles(data ?? []);
@@ -71,12 +116,11 @@ export default function ShowroomPage() {
     return () => controller.abort();
   }, [load]);
 
-  const handleRetry = () => {
-    load();
-  };
-
-  const modelOptions = useMemo(
-    () => ["all", ...Array.from(new Set(vehicles.map((v) => v.name)))],
+  const typeOptions = useMemo(
+    () => [
+      "all",
+      ...Array.from(new Set(vehicles.map((v) => v.type).filter(Boolean))),
+    ],
     [vehicles],
   );
 
@@ -87,28 +131,22 @@ export default function ShowroomPage() {
   );
 
   const filteredCars = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const q = search.trim().toLowerCase();
 
     const filtered = vehicles.filter((car) => {
       const matchesSearch =
-        normalizedSearch.length === 0 ||
-        [car.name, car.type, car.location].some((value) =>
-          (value ?? "").toLowerCase().includes(normalizedSearch),
+        q.length === 0 ||
+        [car.name, car.type, car.location].some((v) =>
+          (v ?? "").toLowerCase().includes(q),
         );
-
-      const matchesModel =
-        selectedModel === "all" || car.name === selectedModel;
-
-      const priceValue = car.price_value;
+      const matchesType = typeFilter === "all" || car.type === typeFilter;
+      const p = car.price_value;
       const matchesPrice =
         priceRange === "all" ||
-        (priceRange === "under-50k" && priceValue < 50000) ||
-        (priceRange === "50k-70k" &&
-          priceValue >= 50000 &&
-          priceValue <= 70000) ||
-        (priceRange === "70k-plus" && priceValue > 70000);
-
-      return matchesSearch && matchesModel && matchesPrice;
+        (priceRange === "under-50k" && p < 50000) ||
+        (priceRange === "50k-70k" && p >= 50000 && p <= 70000) ||
+        (priceRange === "70k-plus" && p > 70000);
+      return matchesSearch && matchesType && matchesPrice;
     });
 
     return [...filtered].sort((a, b) => {
@@ -125,34 +163,42 @@ export default function ShowroomPage() {
           return 0;
       }
     });
-  }, [vehicles, search, selectedModel, sortOrder, priceRange]);
+  }, [vehicles, search, typeFilter, sortOrder, priceRange]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredCars.length / carsPerPage));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredCars.length / CARS_PER_PAGE),
+  );
 
   useEffect(() => {
-    setCurrentPage((page) => Math.min(page, totalPages));
-  }, [filteredCars.length, totalPages]);
+    setCurrentPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedModel, sortOrder, priceRange]);
+  }, [search, typeFilter, sortOrder, priceRange]);
 
   const paginatedCars = useMemo(() => {
-    const start = (currentPage - 1) * carsPerPage;
-    return filteredCars.slice(start, start + carsPerPage);
+    const start = (currentPage - 1) * CARS_PER_PAGE;
+    return filteredCars.slice(start, start + CARS_PER_PAGE);
   }, [filteredCars, currentPage]);
 
   const clearFilters = () => {
     setSearch("");
-    setSelectedModel("all");
+    setTypeFilter("all");
     setSortOrder("newest");
     setPriceRange("all");
   };
 
+  const hasActiveFilters =
+    search.trim() !== "" ||
+    typeFilter !== "all" ||
+    priceRange !== "all" ||
+    sortOrder !== "newest";
+
   const handleAddToCart = (event: React.MouseEvent, car: Vehicle) => {
     event.preventDefault();
     event.stopPropagation();
-
     addToCart({
       id: car.id,
       name: car.name,
@@ -162,23 +208,17 @@ export default function ShowroomPage() {
       type: car.type,
       stock: car.stock,
     });
-
-    setRecentlyAdded((current) => [...current, car.id]);
-    window.setTimeout(() => {
-      setRecentlyAdded((current) => current.filter((id) => id !== car.id));
-    }, 1500);
+    setRecentlyAdded((c) => [...c, car.id]);
+    window.setTimeout(
+      () => setRecentlyAdded((c) => c.filter((id) => id !== car.id)),
+      1500,
+    );
   };
-
-  const hasActiveFilters =
-    search.trim() !== "" ||
-    selectedModel !== "all" ||
-    priceRange !== "all" ||
-    sortOrder !== "newest";
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#1C0606] text-white">
+      <main className="min-h-screen bg-[#1C0606] text-[#FDF5DC]">
         {/* HEADER */}
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
@@ -187,70 +227,30 @@ export default function ShowroomPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
-
-          <div className="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-8 lg:py-24 xl:pr-40 2xl:pr-8">
-            <div className="lg:min-w-0 lg:flex-1">
-              <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
-                Discover the
-                <span className="block text-[#F9A602]">showroom.</span>
+          <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-4 py-14 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8 lg:py-20 xl:pr-40 2xl:pr-8">
+            <div className="max-w-4xl border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+              <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl">
+                Find your next car.
               </h1>
-
-              <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                Handpicked models that balance confidence, comfort, and design.
-                Explore high-performance sedans and luxury SUVs tailored for
-                modern life.
+              <p className="mt-6 max-w-2xl text-base leading-7 text-[#FDF5DC]/70 sm:text-lg">
+                Pick a body type, set your budget and reserve with a 20%
+                downpayment. Every car is on the lot and ready to see.
               </p>
             </div>
 
-            {/* Right side: availability + quick links */}
-            <div className="w-full border-t-4 border-[#9B1111] bg-[#161616] lg:w-[400px] lg:shrink-0">
-              <div className="p-6 sm:p-7">
-                <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <CarFront size={22} className="text-[#9B1111]" />
-                  On the lot
-                </h2>
-
-                <div className="mt-5 border-l-4 border-[#9B1111] bg-[#1C0606] p-5">
-                  {isLoading ? (
-                    <p className="text-sm text-white/60">Counting...</p>
-                  ) : loadError ? (
-                    <p className="text-sm text-white/60">
-                      Count unavailable right now.
-                    </p>
-                  ) : (
-                    <>
-                      <p className="text-6xl font-bold leading-none">
-                        {availableCount}
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-white/60">
-                        vehicle{availableCount !== 1 ? "s" : ""} ready to drive
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <ul className="mt-5 divide-y divide-white/10 border-y border-white/10">
-                  {[
-                    { label: "Sell or trade your car", href: "/sell-trade" },
-                    { label: "Read the blog", href: "/blog" },
-                    { label: "Contact us", href: "/contact" },
-                  ].map((item) => (
-                    <li key={item.label}>
-                      <Link
-                        href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                      >
-                        {item.label}
-                        <ArrowRight
-                          size={18}
-                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
-                        />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+            <div className="flex w-full items-center gap-5 border-t-4 border-[#F9A602] bg-[#2A0A0A] p-6 lg:w-80 lg:shrink-0">
+              <span className="chamfer flex h-14 w-14 shrink-0 items-center justify-center bg-[#9B1111] text-[#F9A602]">
+                <CarFront size={26} />
+              </span>
+              <div>
+                <p className="text-5xl font-black leading-none text-[#F9A602]">
+                  {isLoading || loadError ? "--" : availableCount}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-[#FDF5DC]/65">
+                  car{availableCount !== 1 ? "s" : ""} ready to drive
+                </p>
               </div>
             </div>
           </div>
@@ -258,393 +258,383 @@ export default function ShowroomPage() {
         </section>
 
         {/* LIST */}
-        <section className="bg-[#111111]">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-            {/* FILTERS */}
-            <div className="mb-10 border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-6">
-              <h2 className="mb-4 flex items-center gap-3 text-xl font-bold uppercase">
-                <SlidersHorizontal size={20} className="text-[#9B1111]" />
-                Search &amp; filter
-              </h2>
-
-              <div className="grid gap-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
-                <label className="relative block">
-                  <Search
-                    size={16}
-                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9B1111]"
-                  />
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder="Search model, type, or city"
-                    className={`${fieldClass} pl-11`}
-                  />
-                </label>
-
-                <div className="relative">
-                  <select
-                    value={selectedModel}
-                    onChange={(event) => setSelectedModel(event.target.value)}
-                    className={`${fieldClass} appearance-none pr-10`}
-                  >
-                    {modelOptions.map((model) => (
-                      <option
-                        key={model}
-                        value={model}
-                        className="bg-[#1A1A1A]"
-                      >
-                        {model === "all" ? "All models" : model}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
-                  />
-                </div>
-
-                <div className="relative">
-                  <select
-                    value={sortOrder}
-                    onChange={(event) => setSortOrder(event.target.value)}
-                    className={`${fieldClass} appearance-none pr-10`}
-                  >
-                    <option value="newest" className="bg-[#1A1A1A]">
-                      Newest first
-                    </option>
-                    <option value="oldest" className="bg-[#1A1A1A]">
-                      Oldest first
-                    </option>
-                    <option value="price-low" className="bg-[#1A1A1A]">
-                      Price: low to high
-                    </option>
-                    <option value="price-high" className="bg-[#1A1A1A]">
-                      Price: high to low
-                    </option>
-                  </select>
-                  <ChevronDown
-                    size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
-                  />
-                </div>
-
-                <div className="relative">
-                  <select
-                    value={priceRange}
-                    onChange={(event) => setPriceRange(event.target.value)}
-                    className={`${fieldClass} appearance-none pr-10`}
-                  >
-                    <option value="all" className="bg-[#1A1A1A]">
-                      All price ranges
-                    </option>
-                    <option value="under-50k" className="bg-[#1A1A1A]">
-                      Under ₱50k
-                    </option>
-                    <option value="50k-70k" className="bg-[#1A1A1A]">
-                      ₱50k - ₱70k
-                    </option>
-                    <option value="70k-plus" className="bg-[#1A1A1A]">
-                      ₱70k+
-                    </option>
-                  </select>
-                  <ChevronDown
-                    size={18}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9B1111]"
-                  />
-                </div>
-
-                {/* Only show when a filter is active */}
-                {hasActiveFilters && (
+        <section className="bg-[#150404]">
+          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+            {/* TYPE CHIPS */}
+            {typeOptions.length > 2 && (
+              <div
+                role="group"
+                aria-label="Body type"
+                className="mb-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {typeOptions.map((t) => (
                   <button
+                    key={t}
                     type="button"
-                    onClick={clearFilters}
-                    className="inline-flex h-12 items-center justify-center gap-2 border-2 border-white/20 px-5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    aria-pressed={typeFilter === t}
+                    onClick={() => setTypeFilter(t)}
+                    className={`shrink-0 border-2 px-5 py-2.5 text-sm font-bold uppercase tracking-wider transition-colors ${ring} ${
+                      typeFilter === t
+                        ? "border-[#F9A602] bg-[#F9A602] text-[#1C0606]"
+                        : "border-[#FDF5DC]/20 hover:border-[#F9A602] hover:text-[#F9A602]"
+                    }`}
                   >
-                    <X size={15} />
-                    Clear
+                    {t === "all" ? "All cars" : t}
                   </button>
-                )}
+                ))}
               </div>
-            </div>
+            )}
 
-            {/* CONTENT */}
-            {isLoading ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
-                <p className="mt-6 text-2xl font-bold uppercase">
-                  Loading inventory...
-                </p>
-                <p className="mt-2 text-sm text-white/60">
-                  Preparing the latest vehicles for you.
-                </p>
-              </div>
-            ) : loadError ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <p className="text-2xl font-bold uppercase">
-                  Something went wrong
-                </p>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/70">
-                  {loadError}
-                </p>
+            {/* FILTER BAR */}
+            <div className="grid gap-3 border-t-4 border-[#F9A602] bg-[#2A0A0A] p-4 sm:p-5 lg:grid-cols-[1.5fr_1fr_1fr_auto]">
+              <label className="relative block">
+                <span className="sr-only">Search</span>
+                <Search
+                  size={16}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#F9A602]"
+                />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search model, type, or city"
+                  className={`${fieldClass} pl-11 placeholder:text-[#FDF5DC]/40`}
+                />
+              </label>
+              <Select
+                label="Price range"
+                value={priceRange}
+                onChange={setPriceRange}
+              >
+                {PRICE_RANGES.map((r) => (
+                  <option
+                    key={r.value}
+                    value={r.value}
+                    className="bg-[#2E0C0C]"
+                  >
+                    {r.label}
+                  </option>
+                ))}
+              </Select>
+              <Select label="Sort" value={sortOrder} onChange={setSortOrder}>
+                <option value="newest" className="bg-[#2E0C0C]">
+                  Newest first
+                </option>
+                <option value="oldest" className="bg-[#2E0C0C]">
+                  Oldest first
+                </option>
+                <option value="price-low" className="bg-[#2E0C0C]">
+                  Price: low to high
+                </option>
+                <option value="price-high" className="bg-[#2E0C0C]">
+                  Price: high to low
+                </option>
+              </Select>
+              {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={handleRetry}
-                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  onClick={clearFilters}
+                  className={`inline-flex h-12 items-center justify-center gap-2 border-2 border-[#FDF5DC]/25 px-5 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:bg-[#9B1111] ${ring}`}
                 >
-                  <RotateCcw size={16} />
-                  Retry
+                  <X size={15} />
+                  Clear
                 </button>
-              </div>
-            ) : filteredCars.length === 0 ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <p className="text-2xl font-bold uppercase">
-                  {vehicles.length === 0
-                    ? "No vehicles in the showroom yet"
-                    : "No matching vehicles found"}
-                </p>
-                <p className="mt-2 text-sm text-white/60">
-                  {vehicles.length === 0
-                    ? "Please check back soon for new arrivals."
-                    : "Try adjusting your filters or searching for a different model."}
-                </p>
-                {vehicles.length > 0 && (
+              )}
+            </div>
+
+            {!isLoading && !loadError && vehicles.length > 0 && (
+              <p
+                className="mb-6 mt-4 text-sm font-semibold text-[#FDF5DC]/60"
+                aria-live="polite"
+              >
+                Showing {filteredCars.length} of {vehicles.length} car
+                {vehicles.length !== 1 ? "s" : ""}
+              </p>
+            )}
+
+            <div className="mt-6">
+              {isLoading ? (
+                <div className={stateBox}>
+                  <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#FDF5DC]/15 border-t-[#F9A602]" />
+                  <p className="mt-6 text-2xl font-black uppercase">
+                    Loading cars...
+                  </p>
+                </div>
+              ) : loadError ? (
+                <div className={stateBox}>
+                  <p className="text-2xl font-black uppercase">
+                    Couldn&apos;t load the showroom
+                  </p>
+                  <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#FDF5DC]/70">
+                    {loadError}
+                  </p>
                   <button
                     type="button"
-                    onClick={clearFilters}
-                    className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    onClick={() => load()}
+                    className={goldBtn}
                   >
-                    <X size={15} />
-                    Clear filters
+                    <RotateCcw size={16} />
+                    Try again
                   </button>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                  {paginatedCars.map((car) => {
-                    const unavailable =
-                      car.status !== "available" || car.stock <= 0;
-                    const imageSrc = resolveMediaUrl(car.image, MEDIA_BASE_URL);
-                    const buttonLabel = unavailable
-                      ? car.status === "sold"
-                        ? "Sold"
-                        : car.status === "reserved"
-                          ? "Reserved"
-                          : "Out of stock"
-                      : recentlyAdded.includes(car.id)
-                        ? "Added ✓"
-                        : "Add to Cart";
-                    const badgeText =
-                      unavailable && car.status !== "available"
-                        ? car.status
-                        : car.badge;
+                </div>
+              ) : filteredCars.length === 0 ? (
+                <div className={stateBox}>
+                  <p className="text-2xl font-black uppercase">
+                    {vehicles.length === 0
+                      ? "No cars in the showroom yet"
+                      : "No matching cars found"}
+                  </p>
+                  <p className="mt-2 text-sm text-[#FDF5DC]/60">
+                    {vehicles.length === 0
+                      ? "Check back soon for new arrivals."
+                      : "Try a different body type or price range."}
+                  </p>
+                  {vehicles.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearFilters}
+                      className={goldBtn}
+                    >
+                      <X size={15} />
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                    {paginatedCars.map((car) => {
+                      const unavailable =
+                        car.status !== "available" || car.stock <= 0;
+                      const imageSrc = resolveMediaUrl(
+                        car.image,
+                        MEDIA_BASE_URL,
+                      );
+                      const label = unavailable
+                        ? car.status === "sold"
+                          ? "Sold"
+                          : car.status === "reserved"
+                            ? "Reserved"
+                            : "Out of stock"
+                        : recentlyAdded.includes(car.id)
+                          ? "Added ✓"
+                          : "Add to cart";
+                      const badgeText =
+                        unavailable && car.status !== "available"
+                          ? car.status
+                          : car.badge;
 
-                    return (
-                      <Link
-                        key={car.id}
-                        href={`/showroom/car/${car.id}`}
-                        className="group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#161616] transition-colors hover:border-[#9B1111] hover:bg-[#1C1C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                      >
-                        <div className="relative overflow-hidden bg-[#1C0606] p-3">
-                          {(car.badge || unavailable) && (
-                            // max-w + truncate keeps long badges inside the card.
-                            <div
-                              title={badgeText ?? undefined}
-                              className={`absolute right-0 top-0 z-10 max-w-full truncate px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
-                                unavailable
-                                  ? "bg-white text-[#1C0606]"
-                                  : "bg-[#9B1111] text-white"
-                              }`}
-                            >
-                              {badgeText}
-                            </div>
-                          )}
-
-                          {imageSrc ? (
-                            <Image
-                              src={imageSrc}
-                              alt={car.name}
-                              width={800}
-                              height={500}
-                              unoptimized
-                              className={`h-52 w-full object-contain transition-transform duration-500 group-hover:scale-105 ${
-                                unavailable ? "opacity-60" : ""
-                              }`}
-                            />
-                          ) : (
-                            <div className="flex h-52 w-full items-center justify-center text-sm text-white/40">
-                              No image available
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex flex-1 flex-col p-5">
-                          {/* Top block: grows naturally (title can be 1 to 3 lines). */}
-                          <div>
-                            <p className="text-sm font-semibold text-[#9B1111]">
-                              {car.year} | {car.type}
-                            </p>
-                            <h3 className="mt-1 text-2xl font-bold uppercase leading-tight">
-                              {car.name}
-                            </h3>
-                            <span className="mt-2 block text-xl font-bold text-white">
+                      return (
+                        <Link
+                          key={car.id}
+                          href={`/showroom/car/${car.id}`}
+                          className={`group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#2A0A0A] transition-colors hover:border-[#F9A602] ${ring}`}
+                        >
+                          <div className="relative overflow-hidden bg-[#F5E9C8] p-3 pb-12">
+                            {(car.badge || unavailable) && (
+                              <div
+                                title={badgeText ?? undefined}
+                                className={`absolute right-0 top-0 z-10 max-w-full truncate px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
+                                  unavailable
+                                    ? "bg-[#1C0606] text-[#FDF5DC]"
+                                    : "bg-[#9B1111] text-white"
+                                }`}
+                              >
+                                {badgeText}
+                              </div>
+                            )}
+                            {imageSrc ? (
+                              <Image
+                                src={imageSrc}
+                                alt={car.name}
+                                width={800}
+                                height={500}
+                                unoptimized
+                                className={`h-48 w-full object-contain transition-transform duration-500 group-hover:scale-105 ${unavailable ? "opacity-60" : ""}`}
+                              />
+                            ) : (
+                              <div className="flex h-48 items-center justify-center text-sm text-[#1C0606]/40">
+                                No image available
+                              </div>
+                            )}
+                            <span className="absolute bottom-0 left-0 bg-[#F9A602] px-4 py-2 text-xl font-black text-[#1C0606]">
                               {car.price}
                             </span>
                           </div>
 
-                          {/* Bottom block: pinned to the bottom of every card, with
-                              fixed-height pieces so specs, button and footer line up
-                              across cards in the same row. */}
-                          <div className="mt-auto pt-5">
-                            <div className="mb-5 grid grid-cols-2 gap-3 text-sm">
-                              <div className="min-w-0 bg-[#1C0606] p-3">
-                                <span className="block text-xs font-semibold text-white/50">
+                          <div className="flex flex-1 flex-col p-5">
+                            <p className="text-sm font-semibold text-[#F9A602]">
+                              {car.year} | {car.type}
+                            </p>
+                            <h3 className="mt-1 text-2xl font-black uppercase leading-tight">
+                              {car.name}
+                            </h3>
+
+                            <dl className="mt-4 grid grid-cols-2 divide-x divide-[#FDF5DC]/10 border-y border-[#FDF5DC]/10 text-sm">
+                              <div className="min-w-0 py-3 pr-3">
+                                <dt className="text-xs font-semibold text-[#FDF5DC]/50">
                                   Mileage
-                                </span>
-                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5 text-white">
-                                  {car.mileage}
-                                </span>
-                              </div>
-                              <div className="min-w-0 bg-[#1C0606] p-3">
-                                <span className="block text-xs font-semibold text-white/50">
-                                  Engine
-                                </span>
-                                <span className="mt-2 block min-h-10 line-clamp-2 font-semibold leading-5 text-white">
-                                  {car.engine}
-                                </span>
-                              </div>
-                            </div>
-
-                            <button
-                              type="button"
-                              disabled={unavailable}
-                              onClick={(event) => handleAddToCart(event, car)}
-                              className="mb-3 flex w-full items-center justify-center gap-2 bg-[#9B1111] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 disabled:hover:bg-white/10 disabled:hover:text-white/40"
-                            >
-                              {buttonLabel}
-                            </button>
-
-                            {/* Fixed minimum height + 2-line clamp: long addresses
-                                no longer push the button up. */}
-                            <div className="flex min-h-14 items-center justify-between gap-3 border-t border-white/10 pt-3 text-sm text-white/70">
-                              <span className="flex min-w-0 items-center gap-2">
-                                <MapPin
-                                  size={14}
-                                  className="shrink-0 text-[#9B1111]"
-                                />
-                                <span
-                                  title={car.location}
-                                  className="line-clamp-2 leading-5"
+                                </dt>
+                                <dd
+                                  className="mt-1 line-clamp-1 font-semibold"
+                                  title={car.mileage}
                                 >
-                                  {car.location}
-                                </span>
+                                  {car.mileage}
+                                </dd>
+                              </div>
+                              <div className="min-w-0 py-3 pl-3">
+                                <dt className="text-xs font-semibold text-[#FDF5DC]/50">
+                                  Engine
+                                </dt>
+                                <dd
+                                  className="mt-1 line-clamp-1 font-semibold"
+                                  title={car.engine}
+                                >
+                                  {car.engine}
+                                </dd>
+                              </div>
+                            </dl>
+
+                            <p className="mt-3 flex min-w-0 items-center gap-2 text-sm text-[#FDF5DC]/65">
+                              <MapPin
+                                size={14}
+                                className="shrink-0 text-[#F9A602]"
+                              />
+                              <span
+                                className="line-clamp-1"
+                                title={car.location}
+                              >
+                                {car.location}
                               </span>
-                              <span className="inline-flex shrink-0 items-center gap-2 font-bold uppercase text-white transition-colors group-hover:text-[#9B1111]">
+                            </p>
+
+                            <div className="mt-auto flex items-center gap-3 pt-5">
+                              <button
+                                type="button"
+                                disabled={unavailable}
+                                onClick={(e) => handleAddToCart(e, car)}
+                                className="flex-1 bg-[#9B1111] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#F9A602] hover:text-[#1C0606] disabled:cursor-not-allowed disabled:bg-[#FDF5DC]/10 disabled:text-[#FDF5DC]/40 disabled:hover:bg-[#FDF5DC]/10 disabled:hover:text-[#FDF5DC]/40"
+                              >
+                                {label}
+                              </button>
+                              <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold uppercase transition-colors group-hover:text-[#F9A602]">
                                 Details
                                 <ArrowRight
                                   size={16}
-                                  className="transition-transform duration-300 group-hover:translate-x-1"
+                                  className="transition-transform group-hover:translate-x-1"
                                 />
                               </span>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                {filteredCars.length > carsPerPage && (
-                  <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCurrentPage((page) => Math.max(1, page - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
-                    >
-                      Previous
-                    </button>
-
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      {Array.from(
-                        { length: totalPages },
-                        (_, index) => index + 1,
-                      ).map((page) => (
-                        <button
-                          key={page}
-                          type="button"
-                          onClick={() => setCurrentPage(page)}
-                          aria-current={
-                            currentPage === page ? "page" : undefined
-                          }
-                          className={`flex h-10 w-10 items-center justify-center text-sm font-bold transition-colors ${
-                            currentPage === page
-                              ? "bg-[#9B1111] text-white"
-                              : "border-2 border-white/20 text-white hover:border-[#9B1111] hover:text-[#9B1111]"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCurrentPage((page) => Math.min(totalPages, page + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="inline-flex h-10 items-center justify-center border-2 border-white/20 px-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/20 disabled:hover:bg-transparent"
-                    >
-                      Next
-                    </button>
+                        </Link>
+                      );
+                    })}
                   </div>
-                )}
-              </>
-            )}
+
+                  {filteredCars.length > CARS_PER_PAGE && (
+                    <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className={pageBtn}
+                      >
+                        Previous
+                      </button>
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1,
+                        ).map((page) => (
+                          <button
+                            key={page}
+                            type="button"
+                            onClick={() => setCurrentPage(page)}
+                            aria-current={
+                              currentPage === page ? "page" : undefined
+                            }
+                            className={`flex h-10 w-10 items-center justify-center text-sm font-bold transition-colors ${ring} ${
+                              currentPage === page
+                                ? "bg-[#F9A602] text-[#1C0606]"
+                                : "border-2 border-[#FDF5DC]/25 hover:border-[#F9A602] hover:text-[#F9A602]"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        disabled={currentPage === totalPages}
+                        className={pageBtn}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </section>
 
         {/* WHY US */}
-        <section className="bg-[#1C0606]">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-            <h2 className="max-w-3xl border-l-8 border-[#9B1111] pl-5 text-3xl font-bold uppercase leading-[1] sm:text-4xl lg:text-5xl">
-              Why drivers choose Prime Auto Display Car Trading
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+            <h2 className="max-w-3xl border-l-8 border-[#9B1111] pl-5 text-3xl font-black uppercase leading-none sm:text-4xl lg:text-5xl">
+              Why drivers choose Prime Auto Display
             </h2>
-
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
               {[
                 {
                   icon: Gauge,
                   title: "Inspected quality",
-                  copy: "Every vehicle is reviewed for condition, safety, and performance before it reaches the showroom floor.",
+                  copy: "Every car is checked for condition, safety and performance before it reaches the showroom.",
                 },
                 {
                   icon: Sparkles,
-                  title: "Transparent pricing",
-                  copy: "No hidden surprises. Just clear value, competitive pricing, and straightforward buying guidance.",
+                  title: "Clear pricing",
+                  copy: "The price you see is the price we discuss. No hidden surprises.",
                 },
                 {
                   icon: MapPin,
                   title: "Local experts",
-                  copy: "Our team helps you compare the right fit for your lifestyle, goals, and long-term value.",
+                  copy: "Our team helps you compare cars and find the right fit for your budget.",
                 },
               ].map(({ icon: Icon, title, copy }) => (
                 <div
                   key={title}
-                  className="border-t-4 border-transparent bg-[#161616] p-6 transition-colors hover:border-[#9B1111] hover:bg-[#1C1C1C]"
+                  className="border-t-4 border-[#9B1111] bg-[#FFFBEF] p-6"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center bg-[#9B1111] text-white">
+                  <span className="chamfer flex h-12 w-12 items-center justify-center bg-[#1C0606] text-[#F9A602]">
                     <Icon size={22} />
-                  </div>
-                  <h3 className="mt-5 text-xl font-bold uppercase leading-tight">
+                  </span>
+                  <h3 className="mt-5 text-xl font-black uppercase leading-tight">
                     {title}
                   </h3>
-                  <p className="mt-3 text-sm leading-7 text-white/70">{copy}</p>
+                  <p className="mt-3 text-sm leading-7 text-[#1C0606]/75">
+                    {copy}
+                  </p>
                 </div>
               ))}
+            </div>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/sell-trade"
+                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606]"
+              >
+                Sell / Trade Car
+              </Link>
+              <Link
+                href="/contact"
+                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#FDF5DC] transition-colors hover:bg-[#9B1111]"
+              >
+                Contact Us
+              </Link>
             </div>
           </div>
         </section>

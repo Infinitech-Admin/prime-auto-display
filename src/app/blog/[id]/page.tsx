@@ -1,4 +1,5 @@
 // Path: app/blog/[id]/page.tsx
+
 "use client";
 
 import Link from "next/link";
@@ -17,10 +18,11 @@ import {
   type BlogPost,
 } from "@/lib/api";
 
-export default function BlogPostPage() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+const focus =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
 
+export default function BlogPostPage() {
+  const id = useParams<{ id: string }>()?.id;
   const [post, setPost] = useState<BlogPost | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -30,7 +32,6 @@ export default function BlogPostPage() {
       if (!id) return;
       setIsLoading(true);
       setLoadError(null);
-
       try {
         const { data } = await fetchBlogPost(id, { signal });
         setPost(data);
@@ -57,12 +58,13 @@ export default function BlogPostPage() {
 
   const imageSrc = post ? resolveMediaUrl(post.image, MEDIA_BASE_URL) : "";
   const videoSrc = post ? resolveMediaUrl(post.video, MEDIA_BASE_URL) : "";
+  const panel =
+    "border-t-4 border-[#F9A602] bg-[#2A0A0A] px-6 py-16 text-center";
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#1C0606] text-white">
-        {/* HEADER */}
+      <main className="min-h-screen bg-[#1C0606] text-[#FDF5DC]">
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
@@ -70,65 +72,64 @@ export default function BlogPostPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
-
           <div className="relative mx-auto max-w-5xl px-4 pb-12 pt-28 sm:px-6 sm:pt-32 lg:px-8 lg:pb-16">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-colors hover:text-[#F9A602] ${focus}`}
             >
-              <ArrowLeft size={16} className="text-[#9B1111]" />
+              <ArrowLeft size={16} className="text-[#F9A602]" />
               Back to blog
             </Link>
-
             {post && (
-              <>
-                <p className="mt-8 text-sm font-semibold text-[#9B1111]">
+              <div className="mt-8 border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+                <p className="text-sm font-semibold text-[#F9A602]">
                   {new Date(post.created_at).toLocaleDateString("en-PH", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })}
                 </p>
-                <h1 className="mt-3 max-w-3xl text-4xl font-bold uppercase leading-[0.95] sm:text-5xl lg:text-6xl">
+                <h1 className="mt-3 max-w-3xl text-4xl font-black uppercase leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl">
                   {post.title}
                 </h1>
-              </>
+              </div>
             )}
           </div>
           <div aria-hidden="true" className="tread" />
         </section>
 
-        {/* CONTENT */}
-        <section className="bg-[#111111]">
+        <section className="bg-[#150404]">
           <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
             {isLoading ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
-                <p className="mt-4 text-sm text-white/60">Loading post...</p>
+              <div className={panel}>
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#FDF5DC]/15 border-t-[#F9A602]" />
+                <p className="mt-4 text-sm text-[#FDF5DC]/60">
+                  Loading post...
+                </p>
               </div>
             ) : loadError || !post ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <p className="text-2xl font-bold uppercase">
-                  Something went wrong
+              <div className={panel}>
+                <p className="text-2xl font-black uppercase">
+                  Couldn&apos;t load this post
                 </p>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/70">
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#FDF5DC]/70">
                   {loadError}
                 </p>
                 <button
                   type="button"
                   onClick={() => load()}
-                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className={`chamfer mt-6 inline-flex items-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${focus}`}
                 >
                   <RotateCcw size={16} />
-                  Retry
+                  Try again
                 </button>
               </div>
             ) : (
               <article className="space-y-10">
                 {videoSrc ? (
-                  <div className="overflow-hidden border-t-4 border-[#9B1111] bg-black">
+                  <div className="overflow-hidden border-t-4 border-[#F9A602] bg-black">
                     <video
                       src={videoSrc}
                       poster={imageSrc || undefined}
@@ -139,7 +140,7 @@ export default function BlogPostPage() {
                     />
                   </div>
                 ) : imageSrc ? (
-                  <div className="overflow-hidden border-t-4 border-[#9B1111] bg-[#1C0606]">
+                  <div className="overflow-hidden border-t-4 border-[#F9A602] bg-[#2A0A0A]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageSrc}
@@ -148,8 +149,7 @@ export default function BlogPostPage() {
                     />
                   </div>
                 ) : null}
-
-                <p className="max-w-3xl whitespace-pre-line text-base leading-8 text-white/80 sm:text-lg">
+                <p className="max-w-3xl whitespace-pre-line text-base leading-8 text-[#FDF5DC]/85 sm:text-lg">
                   {post.description}
                 </p>
               </article>
@@ -157,24 +157,21 @@ export default function BlogPostPage() {
           </div>
         </section>
 
-        {/* BOTTOM BAND */}
-        <section className="bg-[#9B1111] text-white">
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <h2 className="text-3xl font-bold uppercase leading-none sm:text-4xl">
+            <h2 className="border-l-8 border-[#9B1111] pl-5 text-4xl font-black uppercase leading-none sm:text-5xl">
               See what&apos;s on the lot
             </h2>
-
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
-                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606]"
               >
                 Visit Showroom
               </Link>
-
               <Link
                 href="/contact"
-                className="chamfer inline-flex items-center justify-center bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#1C0606] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#FDF5DC] transition-colors hover:bg-[#9B1111]"
               >
                 Contact Us
               </Link>

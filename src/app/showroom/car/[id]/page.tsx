@@ -1,4 +1,5 @@
 // Path: app/showroom/car/[id]/page.tsx
+
 "use client";
 
 import Image from "next/image";
@@ -6,13 +7,14 @@ import Link from "next/link";
 import {
   ArrowLeft,
   ArrowRight,
+  Calendar,
+  Fuel,
   Gauge,
   MapPin,
   Play,
   RotateCcw,
   Settings2,
   Sparkles,
-  Star,
   Video,
 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -32,13 +34,13 @@ import {
   type Vehicle,
 } from "@/lib/api";
 
-type Slide = {
-  src: string;
-  alt: string;
-  /** The vehicle's main/cover photo (shown "contained" instead of cropped). */
-  isCover?: boolean;
-};
+/*
+  Prime Auto Display palette
+  dark #1C0606 | page #150404 | panel #2A0A0A | maroon #9B1111 (hover #B91C1C)
+  gold #F9A602 | cream #FDF5DC
+*/
 
+type Slide = { src: string; alt: string; isCover?: boolean };
 type VideoItem = {
   src: string;
   alt: string;
@@ -47,145 +49,108 @@ type VideoItem = {
   duration?: string;
 };
 
-/** Ilagay ang logo.png sa /public/logo.png */
-const LOGO_SRC = "/logo.png";
-
-const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+const ring =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+const panel = "border-t-4 border-[#F9A602] bg-[#2A0A0A]";
+const thumbClass = (active: boolean) =>
+  `relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#1C0606] transition-all sm:h-20 sm:w-28 ${
+    active
+      ? "border-[#F9A602]"
+      : "border-transparent opacity-50 hover:opacity-100"
+  } ${ring}`;
+const strip =
+  "mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3";
 
 /* -------------------------------------------------------------------------- */
-/*  IMAGE GALLERY (images only)                                               */
+/*  PHOTO GALLERY (swipe, arrows, keyboard, thumbnails)                       */
 /* -------------------------------------------------------------------------- */
 
 function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const pointerStartX = useRef<number | null>(null);
-  const stripRef = useRef<HTMLDivElement | null>(null);
-  const thumbRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const startX = useRef<number | null>(null);
+  const thumbs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const last = slides.length - 1;
-  const safeIndex = Math.min(index, last);
+  const i = Math.min(index, last);
+  const next = () => setIndex((c) => (c >= last ? 0 : c + 1));
+  const prev = () => setIndex((c) => (c <= 0 ? last : c - 1));
 
-  const goNext = () =>
-    setIndex((current) => (current >= last ? 0 : current + 1));
-  const goPrevious = () =>
-    setIndex((current) => (current <= 0 ? last : current - 1));
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      goNext();
-    }
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      goPrevious();
-    }
-    if (event.key === "Home") {
-      event.preventDefault();
-      setIndex(0);
-    }
-    if (event.key === "End") {
-      event.preventDefault();
-      setIndex(last);
-    }
-  };
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    pointerStartX.current = event.clientX;
-    setIsDragging(true);
+  const endDrag = (x?: number) => {
+    if (startX.current === null) return;
+    const delta = x === undefined ? dragX : x - startX.current;
+    if (Math.abs(delta) >= 60) (delta < 0 ? next : prev)();
+    startX.current = null;
     setDragX(0);
-  };
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (pointerStartX.current === null || !isDragging) return;
-    setDragX(event.clientX - pointerStartX.current);
-  };
-
-  const finishPointerGesture = (event?: React.PointerEvent<HTMLDivElement>) => {
-    if (pointerStartX.current === null) return;
-
-    const delta =
-      event && typeof event.clientX === "number"
-        ? event.clientX - pointerStartX.current
-        : dragX;
-    const threshold = 60;
-
-    if (Math.abs(delta) >= threshold) {
-      if (delta < 0) goNext();
-      else goPrevious();
-    }
-
-    pointerStartX.current = null;
-    setDragX(0);
-    setIsDragging(false);
-  };
-
-  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) =>
-    finishPointerGesture(event);
-
-  const handlePointerCancel = () => {
-    pointerStartX.current = null;
-    setDragX(0);
-    setIsDragging(false);
   };
 
   useEffect(() => {
-    thumbRefs.current[safeIndex]?.scrollIntoView({
+    thumbs.current[i]?.scrollIntoView({
       behavior: "smooth",
       block: "nearest",
       inline: "center",
     });
-  }, [safeIndex]);
+  }, [i]);
+
+  const arrow = `absolute top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-[#1C0606]/80 text-[#F9A602] transition-colors hover:bg-[#F9A602] hover:text-[#1C0606] ${ring}`;
 
   return (
-    <div className="overflow-hidden border-t-4 border-[#9B1111] bg-[#161616] p-3 sm:p-5">
-      {/* Media */}
+    <div className={`${panel} p-3 sm:p-5`}>
       <div
         role="region"
         aria-roledescription="carousel"
         aria-label={`${carName} photos`}
         tabIndex={0}
-        onKeyDown={handleKeyDown}
-        className={`relative overflow-hidden bg-[#1C0606] ${focusRing}`}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            next();
+          }
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            prev();
+          }
+        }}
+        className={`relative overflow-hidden bg-[#F5E9C8] ${ring}`}
       >
-        {/* Sliding area */}
         <div
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          className={`touch-pan-y select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+          onPointerDown={(e) => {
+            startX.current = e.clientX;
+          }}
+          onPointerMove={(e) => {
+            if (startX.current !== null) setDragX(e.clientX - startX.current);
+          }}
+          onPointerUp={(e) => endDrag(e.clientX)}
+          onPointerCancel={() => endDrag(0)}
+          className="touch-pan-y select-none"
         >
           <div
             className="flex will-change-transform"
             style={{
-              transform: `translate3d(calc(${-safeIndex * 100}% + ${dragX}px), 0, 0)`,
-              transition: isDragging
-                ? "none"
-                : "transform 600ms cubic-bezier(0.22, 1, 0.36, 1)",
+              transform: `translate3d(calc(${-i * 100}% + ${dragX}px), 0, 0)`,
+              transition:
+                startX.current !== null
+                  ? "none"
+                  : "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
-            {slides.map((slide, i) => (
+            {slides.map((s, n) => (
               <div
-                key={`${i}-${slide.src}`}
-                role="group"
-                aria-roledescription="slide"
-                aria-label={`${i + 1} of ${slides.length}`}
-                aria-hidden={i !== safeIndex}
-                className="relative h-[300px] w-full shrink-0 sm:h-[420px] md:h-[480px] lg:h-[560px]"
+                key={`${n}-${s.src}`}
+                aria-hidden={n !== i}
+                className="relative h-[280px] w-full shrink-0 sm:h-[420px] lg:h-[540px]"
               >
                 <Image
-                  src={slide.src}
-                  alt={slide.alt}
+                  src={s.src}
+                  alt={s.alt}
                   fill
-                  priority={i === 0}
+                  priority={n === 0}
                   unoptimized
-                  sizes="(min-width: 1024px) 60vw, (min-width: 640px) 90vw, 100vw"
+                  sizes="(min-width: 1024px) 60vw, 100vw"
                   draggable={false}
-                  className={`relative z-10 ${slide.isCover ? "object-contain p-4 sm:p-6" : "object-cover"}`}
+                  className={
+                    s.isCover ? "object-contain p-4 sm:p-6" : "object-cover"
+                  }
                 />
               </div>
             ))}
@@ -194,75 +159,53 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
 
         {slides.length > 1 && (
           <>
-            {/* PREVIOUS BUTTON */}
             <button
               type="button"
-              onClick={goPrevious}
+              onClick={prev}
               aria-label="Previous photo"
-              className={`absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#1C0606]/80 text-white transition-colors hover:bg-[#9B1111] active:scale-95 sm:left-4 sm:h-11 sm:w-11 ${focusRing}`}
+              className={`${arrow} left-2 sm:left-4`}
             >
               <ArrowLeft size={18} />
             </button>
-
-            {/* NEXT BUTTON */}
             <button
               type="button"
-              onClick={goNext}
+              onClick={next}
               aria-label="Next photo"
-              className={`absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-[#1C0606]/80 text-white transition-colors hover:bg-[#9B1111] active:scale-95 sm:right-4 sm:h-11 sm:w-11 ${focusRing}`}
+              className={`${arrow} right-2 sm:right-4`}
             >
               <ArrowRight size={18} />
             </button>
           </>
         )}
-
-        {/* COUNTER */}
-        <div className="pointer-events-none absolute bottom-0 right-0 z-20 bg-[#9B1111] px-3 py-1.5 text-xs font-bold text-white">
-          {safeIndex + 1} / {slides.length}
+        <div className="pointer-events-none absolute bottom-0 right-0 z-20 bg-[#F9A602] px-3 py-1.5 text-xs font-bold text-[#1C0606]">
+          {i + 1} / {slides.length}
         </div>
-
-        {/* Swipe hint */}
-        {safeIndex === 0 && slides.length > 1 && (
-          <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 bg-[#1C0606]/80 px-3 py-1.5 text-xs font-semibold text-white/80 sm:block">
-            Swipe to explore
-          </div>
-        )}
       </div>
 
-      {/* Thumbnails */}
       {slides.length > 1 && (
-        <div
-          ref={stripRef}
-          className="relative mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-4 sm:gap-3"
-        >
-          {slides.map((slide, i) => {
-            const isActive = i === safeIndex;
-
-            return (
-              <button
-                key={`${i}-${slide.src}`}
-                ref={(el) => {
-                  thumbRefs.current[i] = el;
-                }}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Show photo ${i + 1}`}
-                aria-current={isActive}
-                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#1C0606] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#9B1111] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
-              >
-                <Image
-                  src={slide.src}
-                  alt=""
-                  fill
-                  unoptimized
-                  sizes="112px"
-                  className={
-                    slide.isCover ? "object-contain p-1" : "object-cover"
-                  }
-                />
-              </button>
-            );
-          })}
+        <div className={strip}>
+          {slides.map((s, n) => (
+            <button
+              key={`${n}-${s.src}`}
+              ref={(el) => {
+                thumbs.current[n] = el;
+              }}
+              type="button"
+              onClick={() => setIndex(n)}
+              aria-label={`Show photo ${n + 1}`}
+              aria-current={n === i}
+              className={thumbClass(n === i)}
+            >
+              <Image
+                src={s.src}
+                alt=""
+                fill
+                unoptimized
+                sizes="112px"
+                className={s.isCover ? "object-contain p-1" : "object-cover"}
+              />
+            </button>
+          ))}
         </div>
       )}
     </div>
@@ -270,7 +213,7 @@ function CarGallery({ carName, slides }: { carName: string; slides: Slide[] }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  VIDEO SECTION (separate from the photo gallery)                           */
+/*  VIDEOS                                                                    */
 /* -------------------------------------------------------------------------- */
 
 function VideoSection({
@@ -281,108 +224,79 @@ function VideoSection({
   videos: VideoItem[];
 }) {
   const [index, setIndex] = useState(0);
-
-  const safeIndex = Math.min(index, videos.length - 1);
-  const active = videos[safeIndex];
+  const i = Math.min(index, videos.length - 1);
+  const active = videos[i];
   const isLong = active.length === "long";
 
   return (
-    <section
-      aria-label={`${carName} videos`}
-      className="border-t-4 border-[#9B1111] bg-[#161616] p-3 sm:p-5"
-    >
-      {/* Header */}
-      <div className="mb-4 flex items-center justify-between gap-3 px-1 sm:mb-5">
-        <h2 className="flex items-center gap-3 text-xl font-bold uppercase">
-          <Video className="text-[#9B1111]" size={20} />
+    <section aria-label={`${carName} videos`} className={`${panel} p-3 sm:p-5`}>
+      <div className="mb-4 flex items-center justify-between gap-3 px-1">
+        <h2 className="flex items-center gap-3 text-xl font-black uppercase">
+          <Video className="text-[#F9A602]" size={20} />
           Videos
         </h2>
-
-        <span className="bg-[#1C0606] px-3 py-1.5 text-xs font-bold text-white">
+        <span className="bg-[#1C0606] px-3 py-1.5 text-xs font-bold">
           {videos.length} {videos.length === 1 ? "video" : "videos"}
         </span>
       </div>
 
-      {/* Player */}
-      <div className="relative overflow-hidden bg-[#1C0606]">
-        <div className="relative aspect-video w-full">
-          {/* key forces a fresh <video> whenever the selection changes */}
-          <video
-            key={active.src}
-            src={active.src}
-            poster={active.poster}
-            muted
-            autoPlay={!isLong}
-            loop={!isLong}
-            controls={isLong}
-            playsInline
-            preload="metadata"
-            aria-label={active.alt}
-            className="h-full w-full bg-[#1C0606] object-cover"
-          />
-
-          {active.duration && (
-            <span className="pointer-events-none absolute left-0 top-0 z-20 bg-[#9B1111] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
-              {isLong ? "Full walkthrough" : "Clip"} · {active.duration}
-            </span>
-          )}
-        </div>
+      <div className="relative aspect-video w-full overflow-hidden bg-[#1C0606]">
+        <video
+          key={active.src}
+          src={active.src}
+          poster={active.poster}
+          muted
+          autoPlay={!isLong}
+          loop={!isLong}
+          controls={isLong}
+          playsInline
+          preload="metadata"
+          aria-label={active.alt}
+          className="h-full w-full object-cover"
+        />
+        {active.duration && (
+          <span className="pointer-events-none absolute left-0 top-0 bg-[#F9A602] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-[#1C0606]">
+            {isLong ? "Full walkthrough" : "Clip"} | {active.duration}
+          </span>
+        )}
       </div>
 
-      {/* Video list */}
       {videos.length > 1 && (
-        <div className="relative mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-4 sm:gap-3">
-          {videos.map((video, i) => {
-            const isActive = i === safeIndex;
-            const hasPoster = !!video.poster;
-
-            return (
-              <button
-                key={`${i}-${video.src}`}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`Play video ${i + 1}`}
-                aria-current={isActive}
-                className={`relative h-14 w-20 shrink-0 overflow-hidden border-2 bg-[#1C0606] transition-all duration-300 sm:h-20 sm:w-28 ${isActive ? "border-[#9B1111] opacity-100" : "border-transparent opacity-50 hover:opacity-100"} ${focusRing}`}
-              >
-                {/* Logo fallback (kita kung walang poster / hindi pa loaded ang video frame) */}
+        <div className={strip}>
+          {videos.map((v, n) => (
+            <button
+              key={`${n}-${v.src}`}
+              type="button"
+              onClick={() => setIndex(n)}
+              aria-label={`Play video ${n + 1}`}
+              aria-current={n === i}
+              className={thumbClass(n === i)}
+            >
+              {v.poster ? (
                 <Image
-                  src={LOGO_SRC}
+                  src={v.poster}
                   alt=""
                   fill
                   unoptimized
                   sizes="112px"
-                  className="object-contain p-3 opacity-70"
+                  className="object-cover"
                 />
-
-                {/* Poster kung meron, kung wala, first frame ng video */}
-                {hasPoster ? (
-                  <Image
-                    src={video.poster!}
-                    alt=""
-                    fill
-                    unoptimized
-                    sizes="112px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <video
-                    src={`${video.src}#t=0.5`}
-                    muted
-                    playsInline
-                    preload="metadata"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-                  />
-                )}
-
-                <span className="absolute inset-0 z-10 flex items-center justify-center bg-[#1C0606]/40">
-                  <Play size={16} className="fill-white text-white" />
-                </span>
-              </button>
-            );
-          })}
+              ) : (
+                <video
+                  src={`${v.src}#t=0.5`}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center bg-[#1C0606]/40">
+                <Play size={16} className="fill-[#F9A602] text-[#F9A602]" />
+              </span>
+            </button>
+          ))}
         </div>
       )}
     </section>
@@ -393,9 +307,34 @@ function VideoSection({
 /*  PAGE                                                                      */
 /* -------------------------------------------------------------------------- */
 
+function Message({
+  title,
+  text,
+  children,
+}: {
+  title: string;
+  text: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <>
+      <Navbar />
+      <main className="flex min-h-screen items-center justify-center bg-[#1C0606] px-4 text-[#FDF5DC]">
+        <div className={`${panel} w-full max-w-lg px-6 py-12 text-center`}>
+          <h1 className="text-3xl font-black uppercase leading-tight">
+            {title}
+          </h1>
+          <p className="mt-4 text-sm leading-7 text-[#FDF5DC]/70">{text}</p>
+          {children}
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
 export default function CarDetailsPage() {
-  const params = useParams<{ id: string }>();
-  const id = params?.id;
+  const id = useParams<{ id: string }>()?.id;
 
   const [car, setCar] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -412,7 +351,6 @@ export default function CarDetailsPage() {
       setLoadError("Vehicle ID is missing.");
       return;
     }
-
     const controller = new AbortController();
     setIsLoading(true);
     setLoadError(null);
@@ -428,9 +366,9 @@ export default function CarDetailsPage() {
         setCar(null);
         setLoadError(
           apiErr.status === 404
-            ? "The vehicle you’re looking for may have been sold or moved. Explore our current inventory and we’ll help you find a great alternative."
+            ? "This car may have been sold or moved. Browse the showroom to see what's available now."
             : apiErr.message ||
-                "We couldn’t load this vehicle details page right now. Please try again or browse the showroom.",
+                "We couldn’t load this car right now. Please try again or browse the showroom.",
         );
         setIsLoading(false);
       });
@@ -440,33 +378,24 @@ export default function CarDetailsPage() {
 
   const carImage = car ? resolveMediaUrl(car.image, MEDIA_BASE_URL) : "";
 
-  // Cover image first, then every uploaded gallery IMAGE.
   const slides = useMemo<Slide[]>(() => {
     if (!car) return [];
-
     const gallery: Slide[] = (car.galleryMedia ?? [])
       .filter((m) => m.type === "image")
       .map((m) => ({
         src: resolveMediaUrl(m.src, MEDIA_BASE_URL),
         alt: m.alt || `${car.name} photo`,
       }));
-
     return carImage
       ? [
-          {
-            src: carImage,
-            alt: `${car.name} main view`,
-            isCover: true,
-          },
+          { src: carImage, alt: `${car.name} main view`, isCover: true },
           ...gallery,
         ]
       : gallery;
   }, [car, carImage]);
 
-  // Every uploaded gallery VIDEO goes to its own section.
   const videos = useMemo<VideoItem[]>(() => {
     if (!car) return [];
-
     return (car.galleryMedia ?? [])
       .filter((m) => m.type === "video")
       .map((m) => ({
@@ -484,7 +413,6 @@ export default function CarDetailsPage() {
 
   const handleAddToCart = () => {
     if (!car || unavailable) return;
-
     addToCart({
       id: car.id,
       name: car.name,
@@ -494,65 +422,41 @@ export default function CarDetailsPage() {
       type: car.type,
       stock: car.stock,
     });
-
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1500);
   };
 
   if (isLoading) {
     return (
-      <>
-        <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#1C0606] px-4 text-white">
-          <div className="w-full max-w-md border-t-4 border-[#9B1111] bg-[#161616] px-6 py-12 text-center">
-            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
-            <p className="mt-6 text-2xl font-bold uppercase">Loading vehicle</p>
-            <p className="mt-2 text-sm text-white/60">
-              Preparing the latest details for you.
-            </p>
-          </div>
-        </main>
-        <Footer />
-      </>
+      <Message title="Loading car" text="Getting the latest details.">
+        <div className="mx-auto mt-6 h-10 w-10 animate-spin rounded-full border-2 border-[#FDF5DC]/15 border-t-[#F9A602]" />
+      </Message>
     );
   }
 
   if (loadError || !car) {
     return (
-      <>
-        <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#1C0606] px-4 text-white">
-          <div className="w-full max-w-lg border-t-4 border-[#9B1111] bg-[#161616] px-6 py-12 text-center">
-            <p className="text-sm font-bold text-[#9B1111]">
-              Vehicle unavailable
-            </p>
-            <h1 className="mt-4 text-3xl font-bold uppercase leading-tight">
-              We couldn’t find this car
-            </h1>
-            <p className="mt-4 text-sm leading-7 text-white/70">
-              {loadError ||
-                "The vehicle you’re looking for may have been sold or moved. Explore our current inventory and we’ll help you find a great alternative."}
-            </p>
-            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/showroom"
-                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                Browse showroom
-              </Link>
-              <button
-                type="button"
-                onClick={() => setReloadKey((k) => k + 1)}
-                className="chamfer inline-flex items-center justify-center gap-2 bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#9B1111] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                <RotateCcw size={16} />
-                Retry
-              </button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
+      <Message
+        title="We couldn’t find this car"
+        text={loadError || "This car may have been sold or moved."}
+      >
+        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link
+            href="/showroom"
+            className={`chamfer inline-flex items-center justify-center bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`}
+          >
+            Browse showroom
+          </Link>
+          <button
+            type="button"
+            onClick={() => setReloadKey((k) => k + 1)}
+            className={`chamfer inline-flex items-center justify-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C] ${ring}`}
+          >
+            <RotateCcw size={16} />
+            Try again
+          </button>
+        </div>
+      </Message>
     );
   }
 
@@ -564,30 +468,36 @@ export default function CarDetailsPage() {
         : car.stock <= 0
           ? "Out of stock"
           : "Not available";
+  const cartLabel = unavailable
+    ? statusLabel
+    : justAdded
+      ? "Added to cart ✓"
+      : "Add to cart";
+
+  const quickFacts = [
+    { icon: Calendar, label: "Year", value: car.year },
+    { icon: Gauge, label: "Mileage", value: car.mileage },
+    { icon: Settings2, label: "Transmission", value: car.transmission },
+    { icon: Fuel, label: "Fuel", value: car.fuel },
+  ];
 
   const specs = [
-    { label: "Mileage", value: car.mileage },
     { label: "Engine", value: car.engine },
     { label: "Power", value: car.horsepower },
-    { label: "Transmission", value: car.transmission },
+    { label: "Location", value: car.location },
     {
       label: "Availability",
       value: unavailable ? statusLabel : `${car.stock} in stock`,
     },
   ];
 
-  const highlights = [
-    { icon: Gauge, label: "Engine", value: car.engine },
-    { icon: Settings2, label: "Transmission", value: car.transmission },
-    { icon: MapPin, label: "Location", value: car.location },
-    { icon: Sparkles, label: "Fuel", value: car.fuel },
-  ];
+  const cartBtn = `chamfer flex w-full items-center justify-center gap-2 bg-[#F9A602] px-5 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] disabled:cursor-not-allowed disabled:bg-[#FDF5DC]/10 disabled:text-[#FDF5DC]/40 disabled:hover:bg-[#FDF5DC]/10 disabled:hover:text-[#FDF5DC]/40 ${ring}`;
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#1C0606] text-white">
-        {/* HEADER STRIP */}
+      <main className="min-h-screen bg-[#1C0606] pb-24 text-[#FDF5DC] lg:pb-0">
+        {/* HEADER */}
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
@@ -595,31 +505,52 @@ export default function CarDetailsPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
-
-          <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">
             <Link
               href="/showroom"
-              className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:text-[#9B1111] ${focusRing}`}
+              className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-colors hover:text-[#F9A602] ${ring}`}
             >
-              <ArrowLeft size={16} className="text-[#9B1111]" />
+              <ArrowLeft size={16} className="text-[#F9A602]" />
               Back to showroom
             </Link>
+
+            <div className="mt-6 border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm font-semibold text-[#F9A602]">
+                  {car.year} | {car.type}
+                </p>
+                {car.badge && (
+                  <span className="bg-[#9B1111] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                    {car.badge}
+                  </span>
+                )}
+                {unavailable && (
+                  <span className="bg-[#FDF5DC] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#1C0606]">
+                    {statusLabel}
+                  </span>
+                )}
+              </div>
+              <h1 className="mt-2 max-w-4xl text-4xl font-black uppercase leading-[0.95] tracking-tight sm:text-5xl lg:text-6xl">
+                {car.name}
+              </h1>
+            </div>
           </div>
           <div aria-hidden="true" className="tread" />
         </section>
 
-        <div className="bg-[#111111]">
+        <div className="bg-[#150404]">
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-            {/* Vehicle Area */}
-            <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-8">
-              {/* Media column: photos, then videos */}
-              <div className="min-w-0 space-y-6 lg:col-start-1 lg:row-start-1 lg:space-y-8">
+            <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:gap-8">
+              {/* LEFT: photos, videos, quick facts, description */}
+              <div className="min-w-0 space-y-6 lg:space-y-8">
                 {slides.length > 0 ? (
                   <CarGallery key={car.id} carName={car.name} slides={slides} />
                 ) : (
-                  <div className="flex h-[300px] items-center justify-center border-t-4 border-[#9B1111] bg-[#161616] text-sm text-white/50 sm:h-[420px] lg:h-[560px]">
+                  <div
+                    className={`${panel} flex h-[280px] items-center justify-center text-sm text-[#FDF5DC]/50 sm:h-[420px]`}
+                  >
                     No photos available yet
                   </div>
                 )}
@@ -631,102 +562,92 @@ export default function CarDetailsPage() {
                     videos={videos}
                   />
                 )}
+
+                <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {quickFacts.map(({ icon: Icon, label, value }) => (
+                    <div
+                      key={label}
+                      className="min-w-0 border-l-4 border-[#F9A602] bg-[#2A0A0A] p-4"
+                    >
+                      <Icon
+                        size={18}
+                        className="text-[#F9A602]"
+                        aria-hidden="true"
+                      />
+                      <dt className="mt-3 text-xs font-semibold text-[#FDF5DC]/55">
+                        {label}
+                      </dt>
+                      <dd className="mt-1 break-words font-bold">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {car.description && (
+                  <section className={`${panel} p-5 sm:p-8`}>
+                    <h2 className="flex items-center gap-3 text-2xl font-black uppercase">
+                      <Sparkles className="text-[#F9A602]" size={22} />
+                      About this car
+                    </h2>
+                    <p className="mt-5 max-w-3xl whitespace-pre-line text-sm leading-7 text-[#FDF5DC]/80 sm:text-base">
+                      {car.description}
+                    </p>
+                  </section>
+                )}
               </div>
 
-              {/* Right column: spans both rows so sticky works the whole way down */}
-              <div className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:space-y-8">
-                {/* Vehicle Info */}
-                <aside className="border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-6">
-                  {/* Badge */}
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    {car.badge ? (
-                      <span className="bg-[#9B1111] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                        {car.badge}
-                      </span>
-                    ) : (
-                      <span />
-                    )}
-
-                    <span className="flex items-center gap-1 text-sm font-semibold text-white">
-                      <Star
-                        size={14}
-                        fill="currentColor"
-                        className="text-[#9B1111]"
-                      />
-                      Featured
-                    </span>
-                  </div>
-
-                  {/* Vehicle Type */}
-                  <p className="text-sm font-semibold text-[#9B1111]">
-                    {car.year} | {car.type}
+              {/* RIGHT: price, specs, actions, financing */}
+              <div className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:space-y-8">
+                <aside className={`${panel} p-5 sm:p-6`}>
+                  <p className="text-sm text-[#FDF5DC]/55">Starting price</p>
+                  <p className="mt-1 text-4xl font-black text-[#F9A602] sm:text-5xl">
+                    {car.price}
                   </p>
 
-                  {/* Name */}
-                  <h1 className="mt-2 text-3xl font-bold uppercase leading-[0.95] sm:text-4xl">
-                    {car.name}
-                  </h1>
-
-                  {/* Price */}
-                  <div className="mt-5 flex flex-wrap items-end gap-2 sm:mt-6 sm:gap-3">
-                    <span className="text-4xl font-bold text-white sm:text-5xl">
-                      {car.price}
-                    </span>
-                    <span className="pb-1.5 text-sm text-white/55">
-                      Starting price
-                    </span>
-                  </div>
-
-                  {/* Specifications */}
-                  <div className="mt-6 space-y-3 border-y border-white/10 py-5 text-sm sm:mt-7 sm:py-6 sm:text-base">
-                    {specs.map((spec) => (
+                  <dl className="mt-6 space-y-3 border-y border-[#FDF5DC]/10 py-5 text-sm sm:text-base">
+                    {specs.map((s) => (
                       <div
-                        key={spec.label}
-                        className="flex items-center justify-between gap-4"
+                        key={s.label}
+                        className="flex items-start justify-between gap-4"
                       >
-                        <span className="text-white/55">{spec.label}</span>
-                        <span className="text-right font-semibold text-white">
-                          {spec.value}
-                        </span>
+                        <dt className="shrink-0 text-[#FDF5DC]/55">
+                          {s.label}
+                        </dt>
+                        <dd className="text-right font-semibold">{s.value}</dd>
                       </div>
                     ))}
-                  </div>
+                  </dl>
 
-                  {/* Add to Cart */}
+                  <p className="mt-4 text-xs leading-5 text-[#FDF5DC]/55">
+                    Reserve this car with a 20% downpayment at checkout.
+                  </p>
+
                   <button
                     type="button"
                     disabled={unavailable}
                     onClick={handleAddToCart}
-                    className={`chamfer mt-6 flex w-full items-center justify-center gap-2 bg-[#9B1111] px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40 disabled:hover:bg-white/10 disabled:hover:text-white/40 ${focusRing}`}
+                    className={`${cartBtn} mt-5`}
                   >
-                    {unavailable
-                      ? statusLabel
-                      : justAdded
-                        ? "Added to cart ✓"
-                        : "Add to Cart"}
+                    {cartLabel}
                   </button>
 
-                  {/* CTA */}
                   <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                     <button
                       type="button"
                       disabled={car.status === "sold"}
                       onClick={() => setTestDriveOpen(true)}
-                      className={`chamfer inline-flex items-center justify-center bg-white px-5 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#9B1111] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`}
+                      className={`chamfer inline-flex items-center justify-center bg-[#9B1111] px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-50 ${ring}`}
                     >
                       Book a test drive
                     </button>
-
                     <Link
-                      href="/showroom"
-                      className={`inline-flex items-center justify-center border-2 border-white/25 px-5 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:border-[#9B1111] hover:bg-[#9B1111] ${focusRing}`}
+                      href="/contact"
+                      className={`inline-flex items-center justify-center border-2 border-[#FDF5DC]/25 px-5 py-4 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ring}`}
                     >
-                      Browse more cars
+                      Ask a question
                     </Link>
                   </div>
                 </aside>
 
-                {/* Financing (under the info card) */}
                 <FinancingCalculator
                   key={`financing-${car.id}`}
                   carName={car.name}
@@ -734,41 +655,28 @@ export default function CarDetailsPage() {
                   year={car.year}
                 />
               </div>
-
-              {/* Highlights: sits under the media, filling the left column */}
-              <section className="min-w-0 border-t-4 border-[#9B1111] bg-[#161616] p-5 sm:p-8 lg:col-start-1 lg:row-start-2">
-                <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <Sparkles className="text-[#9B1111]" size={22} />
-                  Vehicle highlights
-                </h2>
-
-                {/* Description */}
-                {car.description && (
-                  <p className="mt-5 max-w-3xl whitespace-pre-line text-sm leading-7 text-white/75 sm:text-base">
-                    {car.description}
-                  </p>
-                )}
-
-                {/* Specs Grid (narrower column now, so 2 cols until xl) */}
-                <div className="mt-7 grid gap-3 sm:mt-8 sm:grid-cols-2 xl:grid-cols-4">
-                  {highlights.map(({ icon: Icon, label, value }) => (
-                    <div
-                      key={label}
-                      className="border-l-4 border-[#9B1111] bg-[#1C0606] p-4"
-                    >
-                      <Icon className="text-[#9B1111]" size={18} />
-                      <p className="mt-3 text-sm text-white/55">{label}</p>
-                      <p className="mt-1 break-words text-lg font-bold text-white">
-                        {value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Mobile sticky bar: price and cart always in reach */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t-4 border-[#F9A602] bg-[#1C0606] px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+        <div className="min-w-0">
+          <p className="text-xs text-[#FDF5DC]/55">Price</p>
+          <p className="truncate text-xl font-black text-[#F9A602]">
+            {car.price}
+          </p>
+        </div>
+        <button
+          type="button"
+          disabled={unavailable}
+          onClick={handleAddToCart}
+          className={`${cartBtn} !w-auto flex-1 !py-3`}
+        >
+          {cartLabel}
+        </button>
+      </div>
 
       <TestDriveDialog
         open={testDriveOpen}

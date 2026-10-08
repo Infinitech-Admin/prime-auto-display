@@ -1,3 +1,5 @@
+// Path: app/checkout/page.tsx
+
 "use client";
 
 import Image from "next/image";
@@ -7,11 +9,12 @@ import {
   Check,
   CheckCircle2,
   Copy,
+  Loader2,
   ShieldCheck,
   Upload,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
@@ -19,14 +22,20 @@ import { useAuth } from "@/context/auth-context";
 import { useCart } from "@/context/cart-context";
 import { placeOrder, type ApiError } from "@/lib/api";
 
+/*
+  Prime Auto Display palette
+  dark #1C0606 | page #150404 | panel #2A0A0A | input #2E0C0C (focus #3A1212)
+  maroon #9B1111 | gold #F9A602 | cream #FDF5DC
+*/
+
 // ---------------------------------------------------------------------------
 // ADJUST: payment settings
 // ---------------------------------------------------------------------------
-const DOWNPAYMENT_RATE = 0.2; // 20% — keep in sync with OrderController.php
+const DOWNPAYMENT_RATE = 0.2; // 20%, keep in sync with OrderController.php
 const MAX_PROOF_SIZE_MB = 5;
 
-// Optional: lets guests who already have an account log in and come back.
-const CHECKOUT_PATH = "/checkout"; // ADJUST if your route is different
+// Lets guests who already have an account log in and come back.
+const CHECKOUT_PATH = "/checkout";
 const LOGIN_URL = `/login?redirect=${encodeURIComponent(CHECKOUT_PATH)}`;
 
 type PaymentMethodId = "gcash" | "maya" | "bank";
@@ -65,7 +74,6 @@ const PAYMENT_METHODS: {
 // ---------------------------------------------------------------------------
 
 const getPriceValue = (price: string) => Number(price.replace(/[₱,]/g, ""));
-
 const formatPrice = (value: number) =>
   `₱${value.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
 
@@ -77,7 +85,6 @@ type FormState = {
   notes: string;
   reference: string;
 };
-
 type ErrorKey = keyof FormState | "proof";
 
 const initialForm: FormState = {
@@ -100,15 +107,99 @@ const serverFieldMap: Record<string, ErrorKey> = {
   payment_proof: "proof",
 };
 
-const inputClasses =
-  "w-full rounded-2xl border border-white/10 bg-[#060606]/20 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none transition-colors focus:border-[#FF2D2D]";
+const ring =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+const inputClass =
+  "w-full border-2 border-[#FDF5DC]/15 bg-[#2E0C0C] px-4 py-3.5 text-[#FDF5DC] placeholder:text-[#FDF5DC]/35 outline-none transition-colors focus:border-[#F9A602] focus:bg-[#3A1212] aria-[invalid=true]:border-[#FF5A61]";
+const panel = "border-t-4 border-[#F9A602] bg-[#2A0A0A]";
+const goldBtn = `chamfer inline-flex items-center justify-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`;
+const ghostBtn = `inline-flex items-center justify-center border-2 border-[#FDF5DC]/25 px-7 py-4 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ring}`;
 
-const labelClasses =
-  "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400";
+function Field({
+  id,
+  label,
+  optional,
+  error,
+  className = "",
+  children,
+}: {
+  id: string;
+  label: string;
+  optional?: boolean;
+  error?: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={className}>
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold">
+        {label}
+        {optional && (
+          <span className="ml-1.5 font-normal text-[#FDF5DC]/45">
+            (optional)
+          </span>
+        )}
+      </label>
+      {children}
+      {error && (
+        <p className="mt-2 text-sm font-medium text-[#FF5A61]">{error}</p>
+      )}
+    </div>
+  );
+}
+
+// Numbered step: the three sections really are a sequence.
+function Step({
+  n,
+  title,
+  hint,
+  children,
+}: {
+  n: number;
+  title: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className={`${panel} p-5 sm:p-8`}>
+      <div className="flex items-center gap-4">
+        <span className="chamfer flex h-10 w-10 shrink-0 items-center justify-center bg-[#9B1111] text-lg font-black text-[#F9A602]">
+          {n}
+        </span>
+        <div>
+          <h2 className="text-2xl font-black uppercase leading-none">
+            {title}
+          </h2>
+          {hint && <p className="mt-1.5 text-sm text-[#FDF5DC]/65">{hint}</p>}
+        </div>
+      </div>
+      <div className="mt-6">{children}</div>
+    </section>
+  );
+}
+
+function Shell({
+  children,
+  center,
+}: {
+  children: ReactNode;
+  center?: boolean;
+}) {
+  return (
+    <>
+      <Navbar />
+      <main
+        className={`min-h-screen bg-[#150404] text-[#FDF5DC] ${center ? "flex items-center justify-center px-4 py-16" : ""}`}
+      >
+        {children}
+      </main>
+      <Footer />
+    </>
+  );
+}
 
 export default function CheckoutPage() {
-  // `user` is optional now: logged-in users get their details prefilled,
-  // guests just fill in the form.
+  // Logged-in users get their details prefilled; guests just fill in the form.
   const { user } = useAuth();
   const { items, clearCart, isHydrated } = useCart();
 
@@ -127,19 +218,16 @@ export default function CheckoutPage() {
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Prefill name/email/phone for logged-in users (without overwriting what
-  // they typed). Does nothing for guests.
   useEffect(() => {
     if (!user) return;
-    setForm((current) => ({
-      ...current,
-      fullName: current.fullName || user.name || "",
-      email: current.email || user.email || "",
-      phone: current.phone || user.phone || "",
+    setForm((c) => ({
+      ...c,
+      fullName: c.fullName || user.name || "",
+      email: c.email || user.email || "",
+      phone: c.phone || user.phone || "",
     }));
   }, [user]);
 
-  // Preview of the selected screenshot.
   useEffect(() => {
     if (!proof) {
       setProofPreview("");
@@ -150,34 +238,30 @@ export default function CheckoutPage() {
     return () => URL.revokeObjectURL(url);
   }, [proof]);
 
-  const subtotal = useMemo(
-    () =>
-      items.reduce(
-        (sum, item) => sum + getPriceValue(item.price) * item.quantity,
-        0,
-      ),
+  const total = useMemo(
+    () => items.reduce((s, i) => s + getPriceValue(i.price) * i.quantity, 0),
     [items],
   );
-  const total = subtotal;
   const downpayment = Math.round(total * DOWNPAYMENT_RATE);
   const balance = total - downpayment;
+  const pct = Math.round(DOWNPAYMENT_RATE * 100);
 
   const selectedMethod = PAYMENT_METHODS.find((m) => m.id === paymentMethod)!;
 
   const handleChange =
     (field: keyof FormState) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setForm((current) => ({ ...current, [field]: event.target.value }));
-      setErrors((current) => ({ ...current, [field]: undefined }));
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((c) => ({ ...c, [field]: e.target.value }));
+      setErrors((c) => ({ ...c, [field]: undefined }));
     };
 
-  const handleProofChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleProofChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
       setErrors((c) => ({ ...c, proof: "Please upload an image file." }));
-      event.target.value = "";
+      e.target.value = "";
       return;
     }
     if (file.size > MAX_PROOF_SIZE_MB * 1024 * 1024) {
@@ -185,10 +269,9 @@ export default function CheckoutPage() {
         ...c,
         proof: `Image must be ${MAX_PROOF_SIZE_MB}MB or smaller.`,
       }));
-      event.target.value = "";
+      e.target.value = "";
       return;
     }
-
     setProof(file);
     setErrors((c) => ({ ...c, proof: undefined }));
   };
@@ -204,26 +287,22 @@ export default function CheckoutPage() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard unavailable — ignore
+      // clipboard unavailable, ignore
     }
   };
 
   const validate = (): boolean => {
-    const nextErrors: Partial<Record<ErrorKey, string>> = {};
-
-    if (!form.fullName.trim()) nextErrors.fullName = "Full name is required.";
-    if (!form.email.trim()) {
-      nextErrors.email = "Email is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      nextErrors.email = "Enter a valid email address.";
-    }
-    if (!form.phone.trim()) nextErrors.phone = "Phone number is required.";
+    const next: Partial<Record<ErrorKey, string>> = {};
+    if (!form.fullName.trim()) next.fullName = "Full name is required.";
+    if (!form.email.trim()) next.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      next.email = "Enter a valid email address.";
+    if (!form.phone.trim()) next.phone = "Phone number is required.";
     if (!form.address.trim())
-      nextErrors.address = "Delivery / pickup address is required.";
-    if (!proof) nextErrors.proof = "Upload your payment screenshot.";
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+      next.address = "Delivery / pickup address is required.";
+    if (!proof) next.proof = "Upload your payment screenshot.";
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -253,7 +332,6 @@ export default function CheckoutPage() {
         data.append("payment_reference", form.reference.trim());
       data.append("payment_proof", proof);
 
-      // From lib/api.ts — works for guests and logged-in users.
       const result = await placeOrder(data);
 
       setSubmittedAsGuest(!user);
@@ -263,8 +341,6 @@ export default function CheckoutPage() {
       clearCart();
     } catch (err) {
       const apiErr = err as ApiError;
-
-      // Laravel 422 -> show messages under the matching fields.
       if (apiErr?.errors) {
         const fieldErrors: Partial<Record<ErrorKey, string>> = {};
         for (const [key, messages] of Object.entries(apiErr.errors)) {
@@ -283,499 +359,450 @@ export default function CheckoutPage() {
     }
   };
 
+  /* ------------------------------ SUCCESS ------------------------------ */
   if (isSubmitted) {
     return (
-      <>
-        <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#111111] px-4 text-white">
-          <div className="w-full max-w-lg rounded-[28px] border border-[#FF2D2D]/30 bg-[#111111] px-6 py-12 text-center shadow-[0_25px_80px_rgba(0,0,0,0.35)] sm:px-10">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-[#FF2D2D]/40 bg-[#FF2D2D]/10">
-              <CheckCircle2 className="text-[#FFFFFF]" size={30} />
-            </div>
+      <Shell center>
+        <div
+          className={`${panel} w-full max-w-lg px-6 py-12 text-center sm:px-10`}
+        >
+          <span className="chamfer mx-auto flex h-16 w-16 items-center justify-center bg-[#9B1111] text-[#F9A602]">
+            <CheckCircle2 size={30} />
+          </span>
+          <h1 className="mt-6 text-4xl font-black uppercase leading-none">
+            Order submitted
+          </h1>
 
-            <h1 className="mt-6 text-3xl font-black tracking-tight text-white">
-              Order submitted
-            </h1>
-            <p className="mt-3 text-sm leading-7 text-zinc-300">
-              Thank you! Your order{" "}
-              {orderNumber && (
-                <span className="font-semibold text-[#FFFFFF]">
-                  {orderNumber}
-                </span>
-              )}{" "}
-              has been received. We&apos;ll verify your{" "}
-              {formatPrice(paidAmount)} downpayment and a sales advisor will
-              contact you to confirm the next steps.
+          {orderNumber && (
+            <p className="mx-auto mt-5 w-fit border-l-4 border-[#F9A602] bg-[#1C0606] px-5 py-3 text-left">
+              <span className="block text-xs font-semibold text-[#FDF5DC]/55">
+                Order number
+              </span>
+              <span className="block text-2xl font-black text-[#F9A602]">
+                {orderNumber}
+              </span>
             </p>
+          )}
 
-            {submittedAsGuest && (
-              <p className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs leading-5 text-zinc-400">
-                Please save your order number
-                {orderNumber ? ` (${orderNumber})` : ""}. You&apos;ll need it,
-                along with the email you used, when contacting us about this
-                order.
-              </p>
-            )}
+          <p className="mt-5 text-sm leading-7 text-[#FDF5DC]/75">
+            We&apos;ll verify your {formatPrice(paidAmount)} downpayment, then a
+            sales advisor will contact you to confirm the next steps.
+          </p>
 
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link
-                href="/showroom"
-                className="inline-flex items-center justify-center rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#FF5A5A]"
-              >
-                Continue browsing
-              </Link>
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:border-[#FF2D2D]/60 hover:bg-white/10"
-              >
-                Back to home
-              </Link>
-            </div>
+          {submittedAsGuest && (
+            <p className="mt-4 bg-[#1C0606] px-4 py-3 text-xs leading-5 text-[#FDF5DC]/65">
+              Save your order number. You&apos;ll need it, with the email you
+              used, when you contact us about this order.
+            </p>
+          )}
+
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/showroom" className={goldBtn}>
+              Continue browsing
+            </Link>
+            <Link href="/" className={ghostBtn}>
+              Back to home
+            </Link>
           </div>
-        </main>
-        <Footer />
-      </>
+        </div>
+      </Shell>
     );
   }
 
-  // Wait for the saved cart before showing anything, so we don't flash
-  // "Your cart is empty".
+  // Wait for the saved cart so we don't flash "Your cart is empty".
   if (!isHydrated) {
     return (
-      <>
-        <Navbar />
-        <main className="min-h-screen bg-[#111111]" />
-        <Footer />
-      </>
+      <Shell>
+        <div className="min-h-screen" />
+      </Shell>
     );
   }
 
   if (items.length === 0) {
     return (
-      <>
-        <Navbar />
-        <main className="flex min-h-screen items-center justify-center bg-[#111111] px-4 text-white">
-          <div className="w-full max-w-md rounded-[28px] border border-dashed border-white/15 bg-[#111111] px-6 py-14 text-center">
-            <p className="text-xl font-semibold text-white">
-              Your cart is empty
-            </p>
-            <p className="mt-2 text-sm text-zinc-400">
-              Add a vehicle to your cart before proceeding to checkout.
-            </p>
-            <Link
-              href="/showroom"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-black transition-all duration-300 hover:bg-[#FF5A5A]"
-            >
-              Browse showroom
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
+      <Shell center>
+        <div className={`${panel} w-full max-w-md px-6 py-14 text-center`}>
+          <h1 className="text-3xl font-black uppercase">Your cart is empty</h1>
+          <p className="mt-2 text-sm text-[#FDF5DC]/65">
+            Add a car to your cart before checking out.
+          </p>
+          <Link href="/showroom" className={`${goldBtn} mt-6`}>
+            Browse showroom
+          </Link>
+        </div>
+      </Shell>
     );
   }
 
+  /* ------------------------------- FORM -------------------------------- */
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-[#111111] text-white">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <Shell>
+      {/* HEADER */}
+      <section className="relative overflow-hidden bg-[#1C0606]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 top-0 hidden h-full w-72 -skew-x-12 bg-[#9B1111] lg:block"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
+        />
+        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <Link
             href="/cart"
-            className="inline-flex items-center gap-2 text-sm font-medium text-[#FFFFFF] transition-colors hover:text-[#FF2D2D]"
+            className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-colors hover:text-[#F9A602] ${ring}`}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} className="text-[#F9A602]" />
             Back to cart
           </Link>
-
-          <div className="mt-5 flex items-center gap-3">
-            <span className="h-px w-10 bg-[#FF2D2D]" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#FFFFFF]">
-              Order Details
-            </span>
-          </div>
-
-          <h1 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl">
-            Checkout
-          </h1>
-
-          {!user && (
-            <p className="mt-3 text-sm text-zinc-400">
-              Checking out as a guest. No account needed.{" "}
-              <Link
-                href={LOGIN_URL}
-                className="font-semibold text-[#FFFFFF] transition-colors hover:text-[#FF2D2D]"
-              >
-                Already have an account? Log in
-              </Link>
+          <div className="mt-6 border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+            <h1 className="text-5xl font-black uppercase leading-[0.95] tracking-tight sm:text-6xl">
+              Checkout
+            </h1>
+            <p className="mt-3 text-base text-[#FDF5DC]/70">
+              {user ? (
+                `Reserve your car with a ${pct}% downpayment.`
+              ) : (
+                <>
+                  Checking out as a guest, no account needed.{" "}
+                  <Link
+                    href={LOGIN_URL}
+                    className="font-semibold text-[#F9A602] underline underline-offset-2 transition-colors hover:text-[#FDF5DC]"
+                  >
+                    Have an account? Log in
+                  </Link>
+                </>
+              )}
             </p>
-          )}
+          </div>
+        </div>
+        <div aria-hidden="true" className="tread" />
+      </section>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-start">
-            {/* Form */}
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="rounded-[28px] border border-white/10 bg-[#111111] p-6 sm:p-8"
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
+            {/* 1. DETAILS */}
+            <Step
+              n={1}
+              title="Your details"
+              hint="We use these to confirm your order."
             >
-              <h2 className="text-lg font-bold text-white">
-                Contact information
-              </h2>
-
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="fullName" className={labelClasses}>
-                    Full name
-                  </label>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field
+                  id="fullName"
+                  label="Full name"
+                  error={errors.fullName}
+                  className="sm:col-span-2"
+                >
                   <input
                     id="fullName"
                     type="text"
+                    autoComplete="name"
                     value={form.fullName}
                     onChange={handleChange("fullName")}
                     placeholder="Juan Dela Cruz"
-                    className={inputClasses}
                     aria-invalid={Boolean(errors.fullName)}
+                    className={inputClass}
                   />
-                  {errors.fullName && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.fullName}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className={labelClasses}>
-                    Email address
-                  </label>
+                </Field>
+                <Field id="email" label="Email" error={errors.email}>
                   <input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={handleChange("email")}
                     placeholder="you@email.com"
-                    className={inputClasses}
                     aria-invalid={Boolean(errors.email)}
+                    className={inputClass}
                   />
-                  {errors.email && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className={labelClasses}>
-                    Phone number
-                  </label>
+                </Field>
+                <Field id="phone" label="Phone number" error={errors.phone}>
                   <input
                     id="phone"
                     type="tel"
+                    autoComplete="tel"
                     value={form.phone}
                     onChange={handleChange("phone")}
                     placeholder="09XX XXX XXXX"
-                    className={inputClasses}
                     aria-invalid={Boolean(errors.phone)}
+                    className={inputClass}
                   />
-                  {errors.phone && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.phone}
-                    </p>
-                  )}
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label htmlFor="address" className={labelClasses}>
-                    Delivery / pickup address
-                  </label>
+                </Field>
+                <Field
+                  id="address"
+                  label="Delivery / pickup address"
+                  error={errors.address}
+                  className="sm:col-span-2"
+                >
                   <input
                     id="address"
                     type="text"
+                    autoComplete="street-address"
                     value={form.address}
                     onChange={handleChange("address")}
                     placeholder="Street, City, Province"
-                    className={inputClasses}
                     aria-invalid={Boolean(errors.address)}
+                    className={inputClass}
                   />
-                  {errors.address && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.address}
-                    </p>
-                  )}
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label htmlFor="notes" className={labelClasses}>
-                    Additional notes{" "}
-                    <span className="text-zinc-600">(optional)</span>
-                  </label>
+                </Field>
+                <Field
+                  id="notes"
+                  label="Notes"
+                  optional
+                  error={errors.notes}
+                  className="sm:col-span-2"
+                >
                   <textarea
                     id="notes"
+                    rows={3}
                     value={form.notes}
                     onChange={handleChange("notes")}
                     placeholder="Preferred schedule, financing questions, trade-in details..."
-                    rows={3}
-                    className={`${inputClasses} resize-none`}
+                    className={`${inputClass} resize-none`}
                   />
-                </div>
+                </Field>
               </div>
+            </Step>
 
-              {/* Payment */}
-              <div className="mt-8 border-t border-white/10 pt-8">
-                <h2 className="text-lg font-bold text-white">
-                  Downpayment ({Math.round(DOWNPAYMENT_RATE * 100)}%)
-                </h2>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Send{" "}
-                  <span className="font-semibold text-[#FFFFFF]">
-                    {formatPrice(downpayment)}
-                  </span>{" "}
-                  using any method below, then upload your screenshot.
-                </p>
-
-                <div className="mt-5 grid grid-cols-3 gap-2">
-                  {PAYMENT_METHODS.map((method) => {
-                    const active = method.id === paymentMethod;
-                    return (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.id)}
-                        aria-pressed={active}
-                        className={`rounded-2xl border px-3 py-3 text-sm font-semibold transition-colors ${
-                          active
-                            ? "border-[#FF2D2D] bg-[#FF2D2D]/10 text-[#FFFFFF]"
-                            : "border-white/10 bg-[#060606]/20 text-zinc-300 hover:border-white/25"
-                        }`}
-                      >
-                        {method.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-[#FF2D2D]/20 bg-[#060606]/20 p-4 text-sm">
-                  {selectedMethod.bankName && (
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-zinc-400">Bank</span>
-                      <span className="font-semibold text-white">
-                        {selectedMethod.bankName}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-zinc-400">Account name</span>
-                    <span className="font-semibold text-white">
-                      {selectedMethod.accountName}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-3 py-1">
-                    <span className="text-zinc-400">
-                      {selectedMethod.id === "bank"
-                        ? "Account number"
-                        : "Number"}
-                    </span>
-                    <span className="flex items-center gap-2 font-semibold text-white">
-                      {selectedMethod.accountNumber}
-                      <button
-                        type="button"
-                        onClick={copyNumber}
-                        aria-label="Copy account number"
-                        className="rounded-full border border-white/10 p-1.5 text-zinc-300 transition-colors hover:border-[#FF2D2D]/60 hover:text-[#FFFFFF]"
-                      >
-                        {copied ? <Check size={14} /> : <Copy size={14} />}
-                      </button>
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between border-t border-white/10 pt-3">
-                    <span className="text-zinc-400">Amount to send</span>
-                    <span className="text-base font-black text-[#FFFFFF]">
-                      {formatPrice(downpayment)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Screenshot upload */}
-                <div className="mt-5">
-                  <label className={labelClasses}>Payment screenshot</label>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProofChange}
-                    className="hidden"
-                    id="proof"
-                  />
-
-                  {proof ? (
-                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#060606]/20 p-3">
-                      {proofPreview ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={proofPreview}
-                          alt="Payment screenshot preview"
-                          className="h-16 w-16 shrink-0 rounded-xl object-cover"
-                        />
-                      ) : (
-                        <div className="h-16 w-16 shrink-0 rounded-xl bg-white/5" />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">
-                          {proof.name}
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          {(proof.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={removeProof}
-                        aria-label="Remove screenshot"
-                        className="rounded-full border border-white/10 p-2 text-zinc-300 transition-colors hover:border-[#FF5A5A]/60 hover:text-[#FFFFFF]"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
+            {/* 2. PAY */}
+            <Step
+              n={2}
+              title={`Send the ${pct}% downpayment`}
+              hint="Use any method below."
+            >
+              <div
+                role="radiogroup"
+                aria-label="Payment method"
+                className="grid grid-cols-3 gap-2 sm:gap-3"
+              >
+                {PAYMENT_METHODS.map((m) => {
+                  const active = m.id === paymentMethod;
+                  return (
                     <button
+                      key={m.id}
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-4 py-8 text-sm transition-colors hover:border-[#FF2D2D]/60 ${
-                        errors.proof
-                          ? "border-[#FF5A5A]/60 text-[#FFFFFF]"
-                          : "border-white/20 text-zinc-400"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setPaymentMethod(m.id)}
+                      className={`border-2 px-3 py-3.5 text-sm font-bold uppercase tracking-wider transition-colors ${ring} ${
+                        active
+                          ? "border-[#F9A602] bg-[#F9A602] text-[#1C0606]"
+                          : "border-[#FDF5DC]/20 hover:border-[#F9A602] hover:text-[#F9A602]"
                       }`}
                     >
-                      <Upload size={20} className="text-[#FFFFFF]" />
-                      Tap to upload screenshot
-                      <span className="text-xs text-zinc-600">
-                        JPG, PNG or WEBP · max {MAX_PROOF_SIZE_MB}MB
-                      </span>
+                      {m.label}
                     </button>
-                  )}
-
-                  {errors.proof && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.proof}
-                    </p>
-                  )}
-                </div>
-
-                <div className="mt-4">
-                  <label htmlFor="reference" className={labelClasses}>
-                    Reference number{" "}
-                    <span className="text-zinc-600">(optional)</span>
-                  </label>
-                  <input
-                    id="reference"
-                    type="text"
-                    value={form.reference}
-                    onChange={handleChange("reference")}
-                    placeholder="e.g. GCash ref. no."
-                    className={inputClasses}
-                  />
-                  {errors.reference && (
-                    <p className="mt-1.5 text-xs text-[#FFFFFF]">
-                      {errors.reference}
-                    </p>
-                  )}
-                </div>
+                  );
+                })}
               </div>
 
-              <div className="mt-6 flex items-start gap-2.5 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs leading-5 text-zinc-400">
-                <ShieldCheck
-                  size={16}
-                  className="mt-0.5 shrink-0 text-[#FFFFFF]"
-                />
-                Your order is confirmed once we verify your payment screenshot.
-                The remaining {formatPrice(balance)} balance will be arranged
-                with your sales advisor.
-              </div>
+              <dl className="mt-5 space-y-3 border-l-4 border-[#F9A602] bg-[#1C0606] p-5 text-sm">
+                {selectedMethod.bankName && (
+                  <div className="flex items-center justify-between gap-4">
+                    <dt className="text-[#FDF5DC]/60">Bank</dt>
+                    <dd className="font-semibold">{selectedMethod.bankName}</dd>
+                  </div>
+                )}
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-[#FDF5DC]/60">Account name</dt>
+                  <dd className="font-semibold">
+                    {selectedMethod.accountName}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <dt className="text-[#FDF5DC]/60">
+                    {selectedMethod.id === "bank" ? "Account number" : "Number"}
+                  </dt>
+                  <dd className="flex items-center gap-2 text-lg font-black">
+                    {selectedMethod.accountNumber}
+                    <button
+                      type="button"
+                      onClick={copyNumber}
+                      aria-label="Copy account number"
+                      className={`flex h-9 w-9 items-center justify-center border-2 border-[#FDF5DC]/25 transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ring}`}
+                    >
+                      {copied ? <Check size={15} /> : <Copy size={15} />}
+                    </button>
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-4 border-t border-[#FDF5DC]/10 pt-3">
+                  <dt className="text-[#FDF5DC]/60">Amount to send</dt>
+                  <dd className="text-2xl font-black text-[#F9A602]">
+                    {formatPrice(downpayment)}
+                  </dd>
+                </div>
+              </dl>
+            </Step>
 
-              {submitError && (
-                <p
-                  role="alert"
-                  className="mt-4 rounded-2xl border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-4 py-3 text-sm text-[#FFFFFF]"
+            {/* 3. PROOF */}
+            <Step
+              n={3}
+              title="Upload your receipt"
+              hint="A screenshot of the payment confirmation."
+            >
+              <input
+                ref={fileInputRef}
+                id="proof"
+                type="file"
+                accept="image/*"
+                onChange={handleProofChange}
+                className="sr-only"
+              />
+
+              {proof ? (
+                <div className="flex items-center gap-4 bg-[#1C0606] p-3">
+                  {proofPreview ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={proofPreview}
+                      alt="Payment screenshot preview"
+                      className="h-20 w-20 shrink-0 object-cover"
+                    />
+                  ) : (
+                    <div className="h-20 w-20 shrink-0 bg-[#2A0A0A]" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold">{proof.name}</p>
+                    <p className="mt-1 text-xs text-[#FDF5DC]/55">
+                      {(proof.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeProof}
+                    aria-label="Remove screenshot"
+                    className={`flex h-10 w-10 items-center justify-center border-2 border-[#FDF5DC]/25 transition-colors hover:border-[#F9A602] hover:bg-[#9B1111] ${ring}`}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`flex w-full flex-col items-center justify-center gap-2 border-2 border-dashed px-4 py-10 text-sm font-semibold transition-colors hover:border-[#F9A602] hover:bg-[#3A1212] ${ring} ${
+                    errors.proof
+                      ? "border-[#FF5A61] text-[#FF5A61]"
+                      : "border-[#FDF5DC]/25 text-[#FDF5DC]/75"
+                  }`}
                 >
-                  {submitError}
+                  <Upload size={24} className="text-[#F9A602]" />
+                  Tap to upload screenshot
+                  <span className="text-xs font-normal text-[#FDF5DC]/50">
+                    JPG, PNG or WEBP, up to {MAX_PROOF_SIZE_MB}MB
+                  </span>
+                </button>
+              )}
+              {errors.proof && (
+                <p className="mt-2 text-sm font-medium text-[#FF5A61]">
+                  {errors.proof}
                 </p>
               )}
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#FF2D2D] px-5 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#FF2D2D] disabled:cursor-not-allowed disabled:opacity-60"
+              <Field
+                id="reference"
+                label="Reference number"
+                optional
+                error={errors.reference}
+                className="mt-5"
               >
-                {isSubmitting
-                  ? "Submitting..."
-                  : `Submit order • ${formatPrice(downpayment)} downpayment`}
-              </button>
-            </form>
+                <input
+                  id="reference"
+                  type="text"
+                  value={form.reference}
+                  onChange={handleChange("reference")}
+                  placeholder="e.g. GCash ref. no."
+                  className={inputClass}
+                />
+              </Field>
+            </Step>
 
-            {/* Order summary */}
-            <div className="rounded-[28px] border border-[#FF2D2D]/20 bg-[#111111] p-6 shadow-[0_25px_80px_rgba(0,0,0,0.35)] lg:sticky lg:top-24">
-              <h2 className="text-lg font-bold text-white">Your order</h2>
-
-              <div className="mt-5 space-y-4 border-b border-white/10 pb-5">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-[#060606]">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          sizes="80px"
-                          unoptimized
-                          className="object-contain p-1"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-white">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-zinc-500">
-                        Qty {item.quantity}
-                      </p>
-                    </div>
-                    <span className="text-sm font-bold text-[#FFFFFF]">
-                      {formatPrice(getPriceValue(item.price) * item.quantity)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 space-y-3 border-b border-white/10 pb-5 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Total price</span>
-                  <span className="font-semibold text-white">
-                    {formatPrice(total)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">
-                    Balance ({100 - Math.round(DOWNPAYMENT_RATE * 100)}%)
-                  </span>
-                  <span className="font-semibold text-white">
-                    {formatPrice(balance)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-5 flex items-center justify-between">
-                <span className="text-base font-semibold text-white">
-                  Downpayment due today
-                </span>
-                <span className="text-2xl font-black text-[#FFFFFF]">
-                  {formatPrice(downpayment)}
-                </span>
-              </div>
+            <div className="flex items-start gap-3 border-l-4 border-[#F9A602] bg-[#2A0A0A] p-4 text-sm leading-6 text-[#FDF5DC]/75">
+              <ShieldCheck
+                size={18}
+                className="mt-0.5 shrink-0 text-[#F9A602]"
+              />
+              Your order is confirmed once we verify your screenshot. We&apos;ll
+              arrange the remaining {formatPrice(balance)} with your sales
+              advisor.
             </div>
-          </div>
+
+            {submitError && (
+              <p
+                role="alert"
+                className="border-l-4 border-[#FF5A61] bg-[#9B1111]/25 px-4 py-3 text-sm font-medium text-[#FFB3B7]"
+              >
+                {submitError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="chamfer flex w-full items-center justify-center gap-2 bg-[#9B1111] px-6 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#F9A602] hover:text-[#1C0606] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602] disabled:cursor-not-allowed disabled:bg-[#FDF5DC]/10 disabled:text-[#FDF5DC]/40 disabled:hover:bg-[#FDF5DC]/10 disabled:hover:text-[#FDF5DC]/40"
+            >
+              {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+              {isSubmitting
+                ? "Submitting..."
+                : `Submit order | ${formatPrice(downpayment)} downpayment`}
+            </button>
+          </form>
+
+          {/* SUMMARY */}
+          <aside className={`${panel} p-5 sm:p-7 lg:sticky lg:top-28`}>
+            <h2 className="text-2xl font-black uppercase">Your order</h2>
+
+            <ul className="mt-5 space-y-4 border-b border-[#FDF5DC]/10 pb-5">
+              {items.map((item) => (
+                <li key={item.id} className="flex items-center gap-3">
+                  <div className="relative h-14 w-20 shrink-0 overflow-hidden bg-[#F5E9C8]">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="80px"
+                        unoptimized
+                        className="object-contain p-1"
+                      />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold uppercase">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-[#FDF5DC]/55">
+                      Qty {item.quantity}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold">
+                    {formatPrice(getPriceValue(item.price) * item.quantity)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <dl className="mt-5 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-[#FDF5DC]/65">Total price</dt>
+                <dd className="font-bold">{formatPrice(total)}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-[#FDF5DC]/65">Balance ({100 - pct}%)</dt>
+                <dd className="font-bold">{formatPrice(balance)}</dd>
+              </div>
+              <div className="flex items-center justify-between bg-[#F9A602] px-4 py-3 text-[#1C0606]">
+                <dt className="font-semibold">Due today ({pct}%)</dt>
+                <dd className="text-2xl font-black">
+                  {formatPrice(downpayment)}
+                </dd>
+              </div>
+            </dl>
+          </aside>
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </Shell>
   );
 }

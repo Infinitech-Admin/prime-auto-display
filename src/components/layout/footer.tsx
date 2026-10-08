@@ -1,19 +1,21 @@
+// Path: components/layout/footer.tsx
+
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { Wordmark } from "@/components/layout/wordmark";
 
 // ---------------------------------------------------------------------------
-// Business details
+// Business details (same as the Contact page)
 // Anything left empty is hidden automatically instead of showing placeholders.
 // ---------------------------------------------------------------------------
-const BUSINESS_NAME = "Prime Auto Display Car Trading";
-const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
-const INSTAGRAM_URL = "https://www.instagram.com/capitaljautofocus";
+const BUSINESS_NAME = "Prime Auto Display";
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61553420834178";
+const TIKTOK_URL = "https://www.tiktok.com/@prime.autodisplay";
 const ADDRESS_LINE_1 = "Blk 28, Lot 26 Vatican City Drive,";
 const ADDRESS_LINE_2 = "BF Resort Village, Talon Dos, Las Piñas City 1747";
-const PHONE_DISPLAY = "0997 253 0052";
-const PHONE_TEL = "+639972530052";
-const EMAIL = "capitaljeycartrading@gmail.com";
+const PHONE_DISPLAY = "0945 975 6255";
+const PHONE_TEL = "+639459756255";
+const EMAIL = "shirleyprimesdisplay@yahoo.com";
 
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   `${BUSINESS_NAME}, ${ADDRESS_LINE_1}, ${ADDRESS_LINE_2}`,
@@ -24,68 +26,88 @@ const FacebookIcon = ({ className }: { className?: string }) => (
     className={className}
     viewBox="0 0 24 24"
     fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
   >
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
   </svg>
 );
 
-const InstagramIcon = ({ className }: { className?: string }) => (
+const TikTokIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    aria-hidden="true"
   >
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z" />
   </svg>
 );
 
-// Prime Auto Display Car Trading palette
-// black #1C0606 | red #9B1111 | red hover #B91C1C | white #FFFFFF
-const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+// Palette: dark #1C0606 | page #150404 | maroon #9B1111 | gold #F9A602 | cream #FDF5DC
+const ring =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
 
-// Square social buttons in each brand's own color
-const socialLink =
-  "flex size-10 items-center justify-center text-white transition-[filter] duration-200 hover:brightness-110";
+const footerLink = `text-[#FDF5DC]/65 transition-colors hover:text-[#F9A602] ${ring}`;
+const headingClass = "text-lg font-black uppercase tracking-wider";
+const socialLink = `flex size-11 items-center justify-center border-2 border-[#FDF5DC]/25 text-[#FDF5DC] transition-colors hover:border-[#F9A602] hover:bg-[#F9A602] hover:text-[#1C0606] ${ring}`;
 
-const footerLink = "text-white/60 transition-colors hover:text-white";
-
-const headingClass =
-  "text-lg font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-[3px] after:w-8 after:bg-[#9B1111]";
+const EXPLORE = [
+  { label: "Showroom", href: "/showroom" },
+  { label: "Sold cars", href: "/sold-cars" },
+  { label: "Sell / Trade car", href: "/sell-trade" },
+  { label: "Blog", href: "/blog" },
+  { label: "About us", href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1C0606] text-white">
-      {/* Tire-tread divider, same as the home hero */}
+    <footer className="bg-[#150404] text-[#FDF5DC]">
+      {/* CALL TO ACTION */}
+      <div className="bg-[#9B1111]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-10 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+          <h2 className="text-3xl font-black uppercase leading-none sm:text-4xl">
+            Ready to see it in person?
+          </h2>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/showroom"
+              className={`chamfer inline-flex items-center justify-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`}
+            >
+              Browse showroom
+              <ArrowRight size={16} />
+            </Link>
+            {PHONE_DISPLAY && PHONE_TEL ? (
+              <a
+                href={`tel:${PHONE_TEL}`}
+                className={`chamfer inline-flex items-center justify-center gap-2 bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider transition-colors hover:bg-[#FDF5DC] hover:text-[#1C0606] ${ring}`}
+              >
+                <Phone size={16} />
+                {PHONE_DISPLAY}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
       <div aria-hidden="true" className="tread" />
 
       <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        {/* Main Footer */}
-        <div className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-4 lg:py-16">
+        <div className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_1.2fr] lg:py-16">
           {/* Brand */}
-          <div className="lg:col-span-1">
+          <div>
             <Link
               href="/"
               aria-label={`${BUSINESS_NAME} home`}
-              className={`group inline-block ${focusRing}`}
+              className={`group inline-block ${ring}`}
             >
               <Wordmark className="text-4xl" />
             </Link>
-
-            <p className="mt-5 max-w-sm text-sm leading-6 text-white/60">
-              Quality pre-owned vehicles, transparent transactions, and a better
-              way to find your next drive.
+            <p className="mt-5 max-w-sm text-sm leading-6 text-[#FDF5DC]/65">
+              Quality pre-owned cars, clear pricing and a better way to find
+              your next drive.
             </p>
 
-            {/* Socials */}
             <div className="mt-6 flex items-center gap-3">
               {FACEBOOK_URL ? (
                 <a
@@ -93,80 +115,50 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`${BUSINESS_NAME} on Facebook`}
-                  className={`${socialLink} bg-[#1877F2] ${focusRing}`}
+                  className={socialLink}
                 >
                   <FacebookIcon className="size-4" />
                 </a>
               ) : null}
-
-              {INSTAGRAM_URL ? (
+              {TIKTOK_URL ? (
                 <a
-                  href={INSTAGRAM_URL}
+                  href={TIKTOK_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${BUSINESS_NAME} on Instagram`}
-                  className={`${socialLink} bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] ${focusRing}`}
+                  aria-label={`${BUSINESS_NAME} on TikTok`}
+                  className={socialLink}
                 >
-                  <InstagramIcon className="size-4" />
+                  <TikTokIcon className="size-4" />
                 </a>
               ) : null}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
+          {/* Explore */}
+          <nav aria-label="Footer">
             <h3 className={headingClass}>Explore</h3>
-
+            <span
+              aria-hidden="true"
+              className="mt-2 block h-[3px] w-8 bg-[#F9A602]"
+            />
             <ul className="mt-6 space-y-3 text-sm">
-              <li>
-                <Link href="/showroom" className={footerLink}>
-                  Browse Inventory
-                </Link>
-              </li>
-              <li>
-                <Link href="/sell-trade" className={footerLink}>
-                  Sell / Trade Car
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className={footerLink}>
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className={footerLink}>
-                  Contact Us
-                </Link>
-              </li>
+              {EXPLORE.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className={footerLink}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
 
-          {/* Services */}
+          {/* Visit us */}
           <div>
-            <h3 className={headingClass}>Services</h3>
-
-            <ul className="mt-6 space-y-3 text-sm">
-              <li>
-                <Link href="/showroom" className={footerLink}>
-                  Vehicle Sales
-                </Link>
-              </li>
-              <li>
-                <Link href="/sell-trade" className={footerLink}>
-                  Vehicle Trade-In
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className={footerLink}>
-                  Test Drive
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className={headingClass}>Contact</h3>
+            <h3 className={headingClass}>Visit us</h3>
+            <span
+              aria-hidden="true"
+              className="mt-2 block h-[3px] w-8 bg-[#F9A602]"
+            />
 
             <div className="mt-6 space-y-4 text-sm">
               <a
@@ -175,7 +167,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className={`flex gap-3 ${footerLink}`}
               >
-                <MapPin className="mt-0.5 size-4 shrink-0 text-[#9B1111]" />
+                <MapPin className="mt-0.5 size-4 shrink-0 text-[#F9A602]" />
                 <address className="not-italic">
                   {ADDRESS_LINE_1}
                   <br />
@@ -188,7 +180,7 @@ export default function Footer() {
                   href={`tel:${PHONE_TEL}`}
                   className={`flex items-center gap-3 ${footerLink}`}
                 >
-                  <Phone className="size-4 text-[#9B1111]" />
+                  <Phone className="size-4 shrink-0 text-[#F9A602]" />
                   {PHONE_DISPLAY}
                 </a>
               ) : null}
@@ -196,45 +188,48 @@ export default function Footer() {
               {EMAIL ? (
                 <a
                   href={`mailto:${EMAIL}`}
-                  className={`flex items-center gap-3 ${footerLink}`}
+                  className={`flex items-center gap-3 break-all ${footerLink}`}
                 >
-                  <Mail className="size-4 text-[#9B1111]" />
+                  <Mail className="size-4 shrink-0 text-[#F9A602]" />
                   {EMAIL}
                 </a>
               ) : null}
+
+              <p className="border-l-4 border-[#F9A602] bg-[#2A0A0A] px-4 py-3 text-[#FDF5DC]/70">
+                Message us on Facebook to confirm our hours before you visit.
+              </p>
             </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="flex flex-col gap-4 border-t border-white/10 py-6 text-center text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:text-left">
+        <div className="flex flex-col gap-4 border-t border-[#FDF5DC]/10 py-6 text-center text-xs text-[#FDF5DC]/55 sm:flex-row sm:items-center sm:justify-between sm:text-left">
           <div className="space-y-1">
             <p>
               &copy; {new Date().getFullYear()} {BUSINESS_NAME}. All rights
               reserved.
             </p>
-            <span>
+            <p>
               Powered by{" "}
               <Link
                 href="https://www.infinitechphil.com/"
-                className="transition-colors hover:text-white"
+                className={`transition-colors hover:text-[#F9A602] ${ring}`}
               >
                 Infinitech Advertising Corporation
               </Link>
-            </span>
+            </p>
           </div>
 
           <div className="flex justify-center gap-5 sm:justify-end">
             <Link
               href="/privacy-policy"
-              className="transition-colors hover:text-white"
+              className={`transition-colors hover:text-[#F9A602] ${ring}`}
             >
               Privacy Policy
             </Link>
-
             <Link
               href="/terms-and-conditions"
-              className="transition-colors hover:text-white"
+              className={`transition-colors hover:text-[#F9A602] ${ring}`}
             >
               Terms &amp; Conditions
             </Link>

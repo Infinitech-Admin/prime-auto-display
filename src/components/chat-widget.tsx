@@ -5,8 +5,11 @@ import { usePathname } from "next/navigation";
 import { Bot, MessageCircle, Send, User, X } from "lucide-react";
 
 const BUSINESS_NAME = "Prime Auto Display Car Trading";
-const FACEBOOK_URL = "https://www.facebook.com/CapitalJEYCarTrading/";
-const ADDRESS = "Blk 28, Lot 26 Vatican City Drive, BF Resort Village, Talon Dos, Las Piñas City";
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61553420834178";
+const TIKTOK_URL = "https://www.tiktok.com/@prime.autodisplay";
+const PHONE_DISPLAY = "0945 975 6255";
+const EMAIL = "shirleyprimesdisplay@yahoo.com";
+const ADDRESS = "Bacoor, Philippines 4102";
 
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF2D2D]";
@@ -32,7 +35,7 @@ function getBotReply(message: string): string {
   }
 
   if (text.includes("financ")) {
-    return `We can go over financing options with you. Send us a message on our Facebook page (${FACEBOOK_URL}) or through our Contact page and our team will follow up.`;
+    return `We can go over financing options with you. Call us at ${PHONE_DISPLAY}, email ${EMAIL}, or send us a message on our Facebook page (${FACEBOOK_URL}) and our team will follow up.`;
   }
 
   if (text.includes("test drive") || text.includes("book")) {
@@ -45,20 +48,24 @@ function getBotReply(message: string): string {
     text.includes("address") ||
     text.includes("visit")
   ) {
-    return `You can find us at ${ADDRESS}. Please message us on Facebook first so we can confirm our hours before you visit.`;
+    return `You can find us in ${ADDRESS}. Please call ${PHONE_DISPLAY} or message us on Facebook first so we can confirm our hours before you visit.`;
   }
 
   if (text.includes("hour") || text.includes("open")) {
-    return `Please message us on our Facebook page (${FACEBOOK_URL}) to confirm our current hours before you visit.`;
+    return `Please call us at ${PHONE_DISPLAY} or message us on our Facebook page (${FACEBOOK_URL}) to confirm our current hours before you visit.`;
   }
 
   if (
     text.includes("contact") ||
     text.includes("facebook") ||
+    text.includes("tiktok") ||
+    text.includes("email") ||
+    text.includes("phone") ||
+    text.includes("number") ||
     text.includes("message") ||
     text.includes("call")
   ) {
-    return `The fastest way to reach us is through our Facebook page: ${FACEBOOK_URL}. You can also use the form on our Contact page.`;
+    return `You can reach us at:\n• Phone: ${PHONE_DISPLAY}\n• Email: ${EMAIL}\n• Facebook: ${FACEBOOK_URL}\n• TikTok: ${TIKTOK_URL}\nYou can also use the form on our Contact page.`;
   }
 
   return "Thanks for reaching out! A member of our team will follow up shortly. Anything specific I can help you with in the meantime?";
@@ -189,7 +196,7 @@ export default function ChatWidget() {
                 )}
 
                 <div
-                  className={`max-w-[75%] break-words rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                  className={`max-w-[75%] whitespace-pre-line break-words rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                     message.role === "user"
                       ? "rounded-br-sm bg-[#FF2D2D] text-black"
                       : "rounded-bl-sm bg-white/[0.06] text-zinc-100"

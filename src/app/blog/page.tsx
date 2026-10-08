@@ -1,9 +1,10 @@
 // Path: app/blog/page.tsx
+
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Newspaper, Play, RotateCcw } from "lucide-react";
+import { ArrowRight, Play, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import Navbar from "@/components/layout/navbar";
@@ -20,12 +21,50 @@ import {
 const DEFAULT_LOAD_ERROR =
   "We couldn’t load the blog right now. Please refresh the page and try again.";
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-PH", {
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString("en-PH", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+const focus =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
+
+function Media({ post, className }: { post: BlogPost; className: string }) {
+  const img = resolveMediaUrl(post.image, MEDIA_BASE_URL);
+  const vid = resolveMediaUrl(post.video, MEDIA_BASE_URL);
+  return (
+    <div className={`relative overflow-hidden bg-[#2A0A0A] ${className}`}>
+      {img ? (
+        <Image
+          src={img}
+          alt={post.title}
+          width={1200}
+          height={675}
+          unoptimized
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : vid ? (
+        <video
+          src={`${vid}#t=0.1`}
+          muted
+          playsInline
+          preload="metadata"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-sm text-[#FDF5DC]/40">
+          No media
+        </div>
+      )}
+      {post.video && (
+        <span className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center bg-[#9B1111] text-white">
+          <Play size={18} className="ml-0.5 fill-white" />
+        </span>
+      )}
+    </div>
+  );
 }
 
 export default function BlogPage() {
@@ -36,7 +75,6 @@ export default function BlogPage() {
   const load = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setLoadError(null);
-
     try {
       const { data } = await fetchBlogPosts({ signal });
       setPosts(data ?? []);
@@ -54,13 +92,15 @@ export default function BlogPage() {
     return () => controller.abort();
   }, [load]);
 
-  const latest = !isLoading && !loadError ? posts[0] : undefined;
+  const [featured, ...rest] = posts;
+
+  const panel =
+    "border-t-4 border-[#F9A602] bg-[#2A0A0A] px-6 py-16 text-center";
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#1C0606] text-white">
-        {/* HEADER */}
+      <main className="min-h-screen bg-[#1C0606] text-[#FDF5DC]">
         <section className="relative overflow-hidden bg-[#1C0606]">
           <div
             aria-hidden="true"
@@ -68,188 +108,146 @@ export default function BlogPage() {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-white lg:block"
+            className="pointer-events-none absolute -right-4 top-0 hidden h-full w-6 -skew-x-12 bg-[#F9A602] lg:block"
           />
-
-          <div className="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-8 lg:py-24 xl:pr-40 2xl:pr-8">
-            <div className="lg:min-w-0 lg:flex-1">
-              <h1 className="max-w-4xl text-5xl font-bold uppercase leading-[0.92] sm:text-6xl lg:text-8xl">
-                News, stories
-                <span className="block text-[#F9A602]">&amp; updates.</span>
+          <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+            <div className="max-w-4xl border-l-8 border-[#F9A602] pl-5 sm:pl-8">
+              <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl">
+                News from the lot.
               </h1>
-
-              <p className="mt-8 max-w-2xl text-base leading-7 text-white/70 sm:text-lg">
-                Fresh arrivals, deliveries, and behind-the-scenes from Capital
-                Jey Car Trading.
+              <p className="mt-6 max-w-2xl text-base leading-7 text-[#FDF5DC]/70 sm:text-lg">
+                New arrivals, happy deliveries, and what&apos;s happening at
+                Prime Auto Display.
               </p>
-            </div>
-
-            {/* Right side: latest post + quick links */}
-            <div className="w-full border-t-4 border-[#9B1111] bg-[#161616] lg:w-[400px] lg:shrink-0">
-              <div className="p-6 sm:p-7">
-                <h2 className="flex items-center gap-3 text-2xl font-bold uppercase">
-                  <Newspaper size={22} className="text-[#9B1111]" />
-                  Latest post
-                </h2>
-
-                {latest ? (
-                  <Link
-                    href={`/blog/${latest.id}`}
-                    className="group mt-5 block border-y border-white/10 py-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  >
-                    <span className="block text-sm text-white/55">
-                      {formatDate(latest.created_at)}
-                    </span>
-                    <span className="mt-2 line-clamp-3 block text-xl font-bold uppercase leading-tight transition-colors group-hover:text-[#9B1111]">
-                      {latest.title}
-                    </span>
-                    <span className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-[#9B1111]">
-                      Read it
-                      <ArrowRight
-                        size={16}
-                        className="transition-transform group-hover:translate-x-1"
-                      />
-                    </span>
-                  </Link>
-                ) : (
-                  <p className="mt-5 border-y border-white/10 py-5 text-sm leading-6 text-white/70">
-                    {isLoading
-                      ? "Loading the latest post..."
-                      : "New posts will show up here."}
-                  </p>
-                )}
-
-                <ul className="mt-2 divide-y divide-white/10">
-                  {[
-                    { label: "Browse the showroom", href: "/showroom" },
-                    { label: "Sell or trade your car", href: "/sell-trade" },
-                    { label: "Contact us", href: "/contact" },
-                  ].map((item) => (
-                    <li key={item.label}>
-                      <Link
-                        href={item.href}
-                        className="group flex items-center justify-between gap-4 py-4 text-sm font-bold uppercase transition-colors hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                      >
-                        {item.label}
-                        <ArrowRight
-                          size={18}
-                          className="shrink-0 text-[#9B1111] transition-transform group-hover:translate-x-1"
-                        />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
           </div>
           <div aria-hidden="true" className="tread" />
         </section>
 
-        {/* POSTS */}
-        <section className="bg-[#111111]">
+        <section className="bg-[#150404]">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
             {isLoading ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-[#9B1111]" />
-                <p className="mt-6 text-2xl font-bold uppercase">
+              <div className={panel}>
+                <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[#FDF5DC]/15 border-t-[#F9A602]" />
+                <p className="mt-6 text-2xl font-black uppercase">
                   Loading posts...
                 </p>
               </div>
             ) : loadError ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <p className="text-2xl font-bold uppercase">
-                  Something went wrong
+              <div className={panel}>
+                <p className="text-2xl font-black uppercase">
+                  Couldn&apos;t load posts
                 </p>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/70">
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#FDF5DC]/70">
                   {loadError}
                 </p>
                 <button
                   type="button"
                   onClick={() => load()}
-                  className="chamfer mt-6 inline-flex items-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white hover:text-[#9B1111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className={`chamfer mt-6 inline-flex items-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${focus}`}
                 >
                   <RotateCcw size={16} />
-                  Retry
+                  Try again
                 </button>
               </div>
-            ) : posts.length === 0 ? (
-              <div className="border-t-4 border-[#9B1111] bg-[#161616] px-6 py-16 text-center">
-                <p className="text-2xl font-bold uppercase">No posts yet</p>
-                <p className="mt-2 text-sm text-white/60">
-                  Please check back soon.
+            ) : !featured ? (
+              <div className={panel}>
+                <p className="text-2xl font-black uppercase">No posts yet</p>
+                <p className="mt-2 text-sm text-[#FDF5DC]/60">
+                  Check back soon for new arrivals and updates.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {posts.map((post) => {
-                  const imageSrc = resolveMediaUrl(post.image, MEDIA_BASE_URL);
-                  const hasVideo = Boolean(post.video);
+              <>
+                {/* Featured */}
+                <Link
+                  href={`/blog/${featured.id}`}
+                  className={`group grid overflow-hidden border-t-4 border-[#F9A602] bg-[#2A0A0A] lg:grid-cols-[1.3fr_1fr] ${focus}`}
+                >
+                  <Media
+                    post={featured}
+                    className="aspect-video lg:aspect-auto lg:min-h-[380px]"
+                  />
+                  <div className="flex flex-col justify-center p-6 sm:p-10">
+                    <p className="text-sm font-semibold text-[#F9A602]">
+                      Latest · {formatDate(featured.created_at)}
+                    </p>
+                    <h2 className="mt-3 line-clamp-3 text-3xl font-black uppercase leading-tight transition-colors group-hover:text-[#F9A602] sm:text-4xl">
+                      {featured.title}
+                    </h2>
+                    <p className="mt-4 line-clamp-4 text-base leading-7 text-[#FDF5DC]/70">
+                      {featured.description}
+                    </p>
+                    <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+                      Read story
+                      <ArrowRight
+                        size={16}
+                        className="text-[#F9A602] transition-transform group-hover:translate-x-1"
+                      />
+                    </span>
+                  </div>
+                </Link>
 
-                  return (
-                    <Link
-                      key={post.id}
-                      href={`/blog/${post.id}`}
-                      className="group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#161616] transition-colors hover:border-[#9B1111] hover:bg-[#1C1C1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                    >
-                      <div className="relative aspect-video overflow-hidden bg-[#1C0606]">
-                        {imageSrc ? (
-                          <Image
-                            src={imageSrc}
-                            alt={post.title}
-                            width={800}
-                            height={450}
-                            unoptimized
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                        ) : hasVideo ? (
-                          <video
-                            src={`${resolveMediaUrl(post.video, MEDIA_BASE_URL)}#t=0.1`}
-                            muted
-                            playsInline
-                            preload="metadata"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-sm text-white/40">
-                            No media
-                          </div>
-                        )}
-
-                        {hasVideo && (
-                          <span className="absolute inset-0 flex items-center justify-center bg-[#1C0606]/40">
-                            <span className="flex h-14 w-14 items-center justify-center bg-[#9B1111] text-white">
-                              <Play
-                                size={22}
-                                className="ml-0.5 fill-white text-white"
-                              />
-                            </span>
+                {rest.length > 0 && (
+                  <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {rest.map((post) => (
+                      <Link
+                        key={post.id}
+                        href={`/blog/${post.id}`}
+                        className={`group flex h-full flex-col overflow-hidden border-t-4 border-transparent bg-[#2A0A0A] transition-colors hover:border-[#F9A602] ${focus}`}
+                      >
+                        <Media post={post} className="aspect-video" />
+                        <div className="flex flex-1 flex-col p-5 sm:p-6">
+                          <p className="text-sm font-semibold text-[#F9A602]">
+                            {formatDate(post.created_at)}
+                          </p>
+                          <h3 className="mt-2 line-clamp-2 text-2xl font-black uppercase leading-tight">
+                            {post.title}
+                          </h3>
+                          <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#FDF5DC]/70">
+                            {post.description}
+                          </p>
+                          <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-bold uppercase tracking-wider transition-colors group-hover:text-[#F9A602]">
+                            Read more
+                            <ArrowRight
+                              size={16}
+                              className="transition-transform group-hover:translate-x-1"
+                            />
                           </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-1 flex-col p-5 sm:p-6">
-                        <p className="text-sm font-semibold text-[#9B1111]">
-                          {formatDate(post.created_at)}
-                        </p>
-                        <h3 className="mt-2 line-clamp-2 text-2xl font-bold uppercase leading-tight">
-                          {post.title}
-                        </h3>
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-white/70">
-                          {post.description}
-                        </p>
-                        <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-bold uppercase tracking-wider text-white transition-colors group-hover:text-[#9B1111]">
-                          Read more
-                          <ArrowRight
-                            size={16}
-                            className="transition-transform duration-300 group-hover:translate-x-1"
-                          />
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
+          </div>
+        </section>
+
+        <section className="bg-[#FDF5DC] text-[#1C0606]">
+          <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <div className="border-l-8 border-[#9B1111] pl-5">
+              <h2 className="text-4xl font-black uppercase leading-none sm:text-5xl">
+                See what&apos;s on the lot
+              </h2>
+              <p className="mt-3 text-base text-[#1C0606]/75">
+                Browse the showroom or sell or trade in your car.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/showroom"
+                className="chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606]"
+              >
+                Visit Showroom
+              </Link>
+              <Link
+                href="/sell-trade"
+                className="chamfer inline-flex items-center justify-center bg-[#1C0606] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#FDF5DC] transition-colors hover:bg-[#9B1111]"
+              >
+                Sell / Trade Car
+              </Link>
+            </div>
           </div>
         </section>
       </main>

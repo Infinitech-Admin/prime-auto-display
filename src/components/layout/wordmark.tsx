@@ -1,92 +1,60 @@
 // components/layout/wordmark.tsx
 //
-// Shared Prime Auto Display Car Trading logo. Used by the navbar, login and register.
+// Shared Prime Auto Display logo. Used by the navbar, login and register.
 // Place it inside an element with the `group` class for the hover effects.
 // Size it with a text-size class: everything inside scales with em.
+//
+// Palette: maroon #9B1111 | gold #F9A602 | dark #1C0606 | cream #FDF5DC
 
-// Tire icon next to the lettering. Spins when the parent `group` is hovered
-// (disabled for reduced motion).
-export function WheelO() {
+type WordmarkProps = {
+  className?: string;
+};
+
+// Shield echoing the logo: gold outline, maroon body, cream band across the middle.
+export function ShieldMark() {
   return (
-    <span
+    <svg
       aria-hidden="true"
-      className="mr-[0.14em] flex h-[1.05em] w-[1.05em] shrink-0 items-center justify-center"
+      viewBox="0 0 48 56"
+      className="h-[1.45em] w-[1.25em] shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5"
     >
-      <svg
-        viewBox="0 0 100 100"
-        className="h-full w-full group-hover:animate-spin motion-reduce:animate-none [animation-duration:1.2s]"
-      >
-        {/* Tire */}
-        <circle
-          cx="50"
-          cy="50"
-          r="47"
-          fill="#1C0606"
-          stroke="#FFFFFF"
-          strokeWidth="5"
-        />
-        {/* Tread marks */}
-        <g stroke="#9B1111" strokeWidth="5" strokeLinecap="round">
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-            <line
-              key={angle}
-              x1="50"
-              y1="6"
-              x2="50"
-              y2="16"
-              transform={`rotate(${angle} 50 50)`}
-            />
-          ))}
-        </g>
-        {/* Rim */}
-        <circle
-          cx="50"
-          cy="50"
-          r="28"
-          fill="none"
-          stroke="#FFFFFF"
-          strokeWidth="5"
-        />
-        {/* Spokes */}
-        <g stroke="#FFFFFF" strokeWidth="5" strokeLinecap="round">
-          {[0, 72, 144, 216, 288].map((angle) => (
-            <line
-              key={angle}
-              x1="50"
-              y1="50"
-              x2="50"
-              y2="26"
-              transform={`rotate(${angle} 50 50)`}
-            />
-          ))}
-        </g>
-        {/* Hub */}
-        <circle cx="50" cy="50" r="9" fill="#9B1111" />
-      </svg>
-    </span>
+      <path
+        d="M24 2 L45 9 V30 C45 42 36 50 24 54 C12 50 3 42 3 30 V9 Z"
+        fill="#F9A602"
+      />
+      <path
+        d="M24 7 L40 12.5 V30 C40 39.5 33 45.5 24 49 C15 45.5 8 39.5 8 30 V12.5 Z"
+        fill="#9B1111"
+      />
+      <path d="M8 24 H40 V32 H8 Z" fill="#FDF5DC" />
+      <path
+        d="M13 28 H35"
+        stroke="#9B1111"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
-// Tire icon + red "CAPITAL" and white "JEY" in squared type, with a thin red
-// rule and "CAR TRADING" underneath. Upright, no italics, no glow.
-export function Wordmark({ className = "" }: { className?: string }) {
+// Kept so any file still importing { WheelO } keeps building.
+export const WheelO = ShieldMark;
+
+export function Wordmark({ className = "" }: WordmarkProps) {
   return (
     <span
       role="img"
-      aria-label="Prime Auto Display Car Trading"
-      className={`inline-flex items-center whitespace-nowrap leading-none ${className}`}
+      aria-label="Prime Auto Display"
+      className={`inline-flex items-center gap-[0.4em] whitespace-nowrap ${className}`}
     >
-      <WheelO />
-      <span aria-hidden="true" className="flex flex-col items-start">
-        <span className="flex items-baseline gap-[0.18em] font-[family-name:var(--font-rajdhani)] font-bold uppercase tracking-[0.04em]">
-          <span className="text-[#9B1111] transition-colors duration-300 group-hover:text-[#B91C1C]">
-            Capital
-          </span>
-          <span className="text-white">Jey</span>
+      <ShieldMark />
+
+      <span aria-hidden="true" className="flex flex-col leading-none">
+        <span className="font-black uppercase italic tracking-tight text-[#FDF5DC] transition-colors duration-300 group-hover:text-[#F9A602]">
+          Prime
         </span>
-        <span className="mt-[0.3em] flex w-full items-center gap-[0.5em] text-[0.3em] font-semibold uppercase tracking-[0.35em] text-white/80">
-          <span className="h-[2px] w-[1.6em] bg-[#9B1111]" />
-          Car Trading
+        <span className="mt-[0.18em] text-[0.3em] font-bold uppercase italic tracking-[0.22em] text-[#F9A602] transition-colors duration-300 group-hover:text-[#FDF5DC]">
+          Auto Display
         </span>
       </span>
     </span>

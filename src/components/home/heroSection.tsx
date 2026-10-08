@@ -35,80 +35,79 @@ const benefits = [
   Prime Auto Display palette
   maroon #9B1111 (hover #B91C1C) | gold #F9A602 | dark #1C0606 | cream #FDF5DC
 
-  One page-load moment: the speed lines shoot in from the right edge, then the
-  headline, copy and buttons settle one after another. Off for reduced motion.
+  One page-load moment: the three headline words rise in one after another,
+  then the copy and buttons. Switched off for reduced motion.
 */
 const heroAnimations = `
-  @keyframes pad-line  { from { transform: translateX(60%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  @keyframes pad-rise  { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .pad-line { animation: pad-line 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
-  .pad-rise { animation: pad-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes pad-rise { from { transform: translateY(18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .pad-rise { animation: pad-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) both; }
   @media (prefers-reduced-motion: reduce) {
-    .pad-line, .pad-rise { animation: none !important; }
+    .pad-rise { animation: none !important; }
   }
 `;
-
-// Tapered gold speed lines, like the motion swoosh behind the car.
-function SpeedLines({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 200 60"
-      className={`h-auto text-[#F9A602] ${className}`}
-    >
-      <polygon points="0,6 200,24 0,14" fill="currentColor" />
-      <polygon points="30,24 200,30 30,34" fill="currentColor" opacity="0.7" />
-      <polygon points="0,46 200,36 0,54" fill="currentColor" />
-    </svg>
-  );
-}
 
 export default function HeroSection() {
   return (
     <section className="bg-[#1C0606]">
       <style>{heroAnimations}</style>
 
-      <div className="relative flex min-h-[80vh] items-center overflow-hidden">
-        {/* Full photo behind the text */}
+      <div className="relative flex min-h-[620px] items-end overflow-hidden lg:min-h-[86vh]">
+        {/* Showroom photo, kept bright so the cars are the hero */}
         <Image
           src="/showroom-collection.jpg"
           alt="Prime Auto Display showroom"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-[65%_center]"
         />
 
-        {/* Left-to-right fade keeps the headline readable and the car visible on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1C0606] via-[#1C0606]/75 to-[#1C0606]/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1C0606]/80 via-transparent to-transparent" />
+        {/* Light tint overall, heavier only at the bottom where the text sits */}
+        <div className="absolute inset-0 bg-[#1C0606]/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1C0606] via-[#1C0606]/70 via-35% to-transparent to-65%" />
 
-        {/* Speed lines streaking in from the right edge */}
-        <div className="pad-line pointer-events-none absolute right-0 top-1/2 hidden -translate-y-1/2 md:block">
-          <SpeedLines className="w-56 lg:w-96" />
-        </div>
+        {/* Gold slash, a nod to the stripe on the logo shield */}
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-[#F9A602] via-[#F9A602] to-transparent"
+        />
 
-        {/* Content (left aligned) */}
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <div className="max-w-3xl border-l-4 border-[#F9A602] pl-5 sm:pl-8">
-            <h1
-              className="pad-rise text-5xl font-black uppercase leading-[0.95] tracking-tight text-[#FDF5DC] [text-shadow:0_2px_24px_rgba(0,0,0,0.6)] sm:text-6xl lg:text-8xl"
-              style={{ animationDelay: "0.25s" }}
+        {/* Content: bottom left, so the photo stays clear above */}
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-14 pt-40 sm:px-6 lg:px-8 lg:pb-20">
+          <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight text-[#FDF5DC] [text-shadow:0_2px_30px_rgba(0,0,0,0.55)] sm:text-6xl lg:text-7xl xl:text-8xl">
+            <span
+              className="pad-rise block lg:mr-5 lg:inline-block"
+              style={{ animationDelay: "0.15s" }}
             >
-              Your next car, checked and ready to drive.
-            </h1>
-
-            <p
-              className="pad-rise mt-6 max-w-xl text-base leading-7 text-[#FDF5DC]/85 lg:text-lg"
+              Buy it.
+            </span>
+            <span
+              className="pad-rise block lg:mr-5 lg:inline-block"
+              style={{ animationDelay: "0.3s" }}
+            >
+              Sell it.
+            </span>
+            <span
+              className="pad-rise block text-[#F9A602] lg:inline-block"
               style={{ animationDelay: "0.45s" }}
             >
-              Every vehicle is inspected before it reaches the showroom, with
-              clear details from your first look to the day you get the keys.
+              Trade it.
+            </span>
+          </h1>
+
+          <div className="mt-6 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <p
+              className="pad-rise max-w-xl text-base leading-7 text-[#FDF5DC]/85 lg:text-lg"
+              style={{ animationDelay: "0.65s" }}
+            >
+              Every car is inspected before it reaches our showroom. Looking to
+              sell or trade yours? Tell us about it and we&apos;ll take it from
+              there.
             </p>
 
             <div
-              className="pad-rise mt-9 flex flex-col items-start gap-3 sm:flex-row sm:gap-4"
-              style={{ animationDelay: "0.6s" }}
+              className="pad-rise flex flex-col gap-3 sm:flex-row sm:gap-4"
+              style={{ animationDelay: "0.8s" }}
             >
               <Link
                 href="/showroom"
@@ -135,22 +134,24 @@ export default function HeroSection() {
       {/* Tire-tread divider */}
       <div aria-hidden="true" className="tread" />
 
-      {/* Benefits strip: cream, so the page flips from the dark hero to the light site */}
-      <div className="border-t-4 border-[#F9A602] bg-[#FDF5DC]">
-        <ul className="mx-auto grid max-w-7xl grid-cols-2 divide-[#1C0606]/10 lg:grid-cols-4 lg:divide-x">
+      {/* Benefits strip: continues the dark of the hero's bottom fade */}
+      <div className="bg-[#1C0606]">
+        <ul className="mx-auto grid max-w-7xl grid-cols-2 divide-[#FDF5DC]/10 lg:grid-cols-4 lg:divide-x">
           {benefits.map(({ icon: Icon, title, description }) => (
             <li
               key={title}
-              className="flex items-center gap-3 border-t-4 border-transparent px-4 py-5 transition-colors hover:border-[#9B1111] sm:gap-4 sm:px-6 sm:py-6"
+              className="flex items-center gap-3 border-t-4 border-transparent px-4 py-5 transition-colors hover:border-[#F9A602] sm:gap-4 sm:px-6 sm:py-6"
             >
-              <div className="chamfer flex size-11 shrink-0 items-center justify-center bg-[#9B1111]">
-                <Icon size={22} strokeWidth={1.8} className="text-[#F9A602]" />
-              </div>
+              <Icon
+                size={28}
+                strokeWidth={1.8}
+                className="shrink-0 text-[#F9A602]"
+              />
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-[#1C0606] sm:text-lg">
+                <h3 className="text-base font-bold text-[#FDF5DC] sm:text-lg">
                   {title}
                 </h3>
-                <p className="mt-0.5 text-xs leading-5 text-[#1C0606]/65 sm:text-sm">
+                <p className="mt-0.5 text-xs leading-5 text-[#FDF5DC]/65 sm:text-sm">
                   {description}
                 </p>
               </div>

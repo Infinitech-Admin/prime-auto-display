@@ -19,18 +19,18 @@ const navigation = [
   { name: "Contact", href: "/contact" },
 ];
 
-// Prime Auto Display Car Trading palette
-// black #1C0606 | red #9B1111 | red hover #B91C1C | white #FFFFFF
+// Prime Auto Display palette
+// dark #1C0606 | maroon #9B1111 (hover #B91C1C) | gold #F9A602 | cream #FDF5DC
 const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
 
-// Square icon buttons with a red edge on hover (no glow)
+// Square icon buttons: gold edge and maroon fill on hover (no glow)
 const iconButton =
-  "border border-white/20 bg-white/5 text-white transition-colors duration-200 hover:border-[#9B1111] hover:bg-[#9B1111]";
+  "border border-[#FDF5DC]/20 bg-[#FDF5DC]/5 text-[#FDF5DC] transition-colors duration-200 hover:border-[#F9A602] hover:bg-[#9B1111]";
 
 // Same look for the Login / account button rendered inside <UserMenu />
 const loginStyle =
-  "[&>a]:rounded-none [&>a]:border [&>a]:border-white/20 [&>a:hover]:border-[#9B1111] [&>a:hover]:bg-[#9B1111] [&>button]:rounded-none [&>button]:border [&>button]:border-white/20 [&>button:hover]:border-[#9B1111]";
+  "[&>a]:rounded-none [&>a]:border [&>a]:border-[#FDF5DC]/20 [&>a:hover]:border-[#F9A602] [&>a:hover]:bg-[#9B1111] [&>button]:rounded-none [&>button]:border [&>button]:border-[#FDF5DC]/20 [&>button:hover]:border-[#F9A602]";
 
 // Minimal shape of the event we care about, not in the standard lib.dom types yet.
 interface BeforeInstallPromptEvent extends Event {
@@ -135,8 +135,8 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Always solid black, with a red line underneath */}
-      <header className="sticky top-0 z-50 border-b-2 border-[#9B1111] bg-[#1C0606]">
+      {/* Always solid dark, with a gold line underneath */}
+      <header className="sticky top-0 z-50 border-b-2 border-[#F9A602] bg-[#1C0606]">
         <nav
           aria-label="Main"
           className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8"
@@ -145,7 +145,7 @@ export default function Navbar() {
             {/* LOGO */}
             <Link
               href="/"
-              aria-label="Prime Auto Display Car Trading home"
+              aria-label="Prime Auto Display home"
               className={`group flex w-fit items-center justify-self-start ${focusRing}`}
             >
               <Wordmark className="text-3xl sm:text-4xl lg:text-3xl xl:text-4xl" />
@@ -161,7 +161,7 @@ export default function Navbar() {
                     key={item.name}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className={`relative whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold uppercase tracking-wide xl:px-3.5 xl:text-sm transition-colors duration-200 ${focusRing} ${active ? "text-white after:absolute after:inset-x-3 after:-bottom-[26px] after:h-[3px] after:bg-[#9B1111]" : "text-white/70 hover:text-white"}`}
+                    className={`relative whitespace-nowrap px-2.5 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors duration-200 xl:px-3.5 xl:text-sm ${focusRing} ${active ? "text-[#F9A602] after:absolute after:inset-x-3 after:-bottom-[26px] after:h-[3px] after:bg-[#F9A602]" : "text-[#FDF5DC]/75 hover:text-[#F9A602]"}`}
                   >
                     {item.name}
                   </Link>
@@ -169,14 +169,14 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* RIGHT SIDE: INSTALL + CART + ACCOUNT + MOBILE MENU */}
+            {/* RIGHT SIDE: INSTALL + BELL + CART + ACCOUNT + MOBILE MENU */}
             <div className="flex shrink-0 items-center gap-2 lg:ml-0">
               {/* Install App */}
               {canInstall && (
                 <button
                   type="button"
                   onClick={handleInstallClick}
-                  className={`hidden items-center gap-2 whitespace-nowrap px-4 py-2.5 text-sm font-semibold sm:flex lg:hidden 2xl:flex ${iconButton} ${focusRing}`}
+                  className={`chamfer hidden items-center gap-2 whitespace-nowrap bg-[#9B1111] px-4 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-[#B91C1C] sm:flex lg:hidden 2xl:flex ${focusRing}`}
                 >
                   <Download size={16} strokeWidth={2.25} />
                   Install App
@@ -196,7 +196,7 @@ export default function Navbar() {
               >
                 <ShoppingCart size={20} strokeWidth={2} />
                 {totalItems > 0 && (
-                  <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[20px] items-center justify-center bg-[#9B1111] px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-[20px] items-center justify-center bg-[#F9A602] px-1 text-[10px] font-bold text-[#1C0606]">
                     {totalItems > 99 ? "99+" : totalItems}
                   </span>
                 )}
@@ -214,7 +214,7 @@ export default function Navbar() {
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-menu"
                 onClick={() => setIsMenuOpen((open) => !open)}
-                className={`flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12 lg:hidden ${iconButton} ${isMenuOpen ? "!border-[#9B1111] !bg-[#9B1111]" : ""} ${focusRing}`}
+                className={`flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12 lg:hidden ${iconButton} ${isMenuOpen ? "!border-[#F9A602] !bg-[#9B1111]" : ""} ${focusRing}`}
               >
                 {isMenuOpen ? (
                   <X size={21} strokeWidth={2} />
@@ -243,13 +243,13 @@ export default function Navbar() {
 
         {/* Navigation Drawer */}
         <div
-          className={`absolute right-0 top-0 h-full w-full max-w-md border-l-2 border-[#9B1111] bg-[#1C0606] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute right-0 top-0 h-full w-full max-w-md border-l-2 border-[#F9A602] bg-[#1C0606] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           {/* Drawer Header */}
-          <div className="flex h-[72px] items-center justify-between border-b border-white/10 px-5 sm:h-[76px] sm:px-6">
+          <div className="flex h-[72px] items-center justify-between border-b border-[#FDF5DC]/10 px-5 sm:h-[76px] sm:px-6">
             <Link
               href="/"
-              aria-label="Prime Auto Display Car Trading home"
+              aria-label="Prime Auto Display home"
               onClick={() => setIsMenuOpen(false)}
               className={`group ${focusRing}`}
             >
@@ -273,7 +273,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={handleInstallClick}
-                className={`mb-6 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold ${iconButton} ${focusRing}`}
+                className={`chamfer mb-6 flex items-center justify-center gap-2 bg-[#9B1111] px-4 py-3 text-sm font-bold text-white transition-colors duration-200 hover:bg-[#B91C1C] ${focusRing}`}
               >
                 <Download size={16} strokeWidth={2.25} />
                 Install App
@@ -300,12 +300,12 @@ export default function Navbar() {
                         href={item.href}
                         aria-current={active ? "page" : undefined}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`group flex min-h-[62px] items-center justify-between border-b border-white/10 px-3 text-xl font-semibold uppercase tracking-wide transition-colors duration-200 sm:min-h-[68px] sm:text-2xl ${focusRing} ${active ? "border-l-4 border-l-[#9B1111] bg-white/5 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        className={`group flex min-h-[62px] items-center justify-between border-b border-[#FDF5DC]/10 px-3 text-xl font-semibold uppercase tracking-wide transition-colors duration-200 sm:min-h-[68px] sm:text-2xl ${focusRing} ${active ? "border-l-4 border-l-[#F9A602] bg-[#FDF5DC]/5 text-[#F9A602]" : "text-[#FDF5DC]/75 hover:bg-[#FDF5DC]/5 hover:text-[#F9A602]"}`}
                       >
                         {item.name}
                         <ArrowRight
                           size={19}
-                          className={`transition-all duration-200 ${active ? "text-[#9B1111]" : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
+                          className={`transition-all duration-200 ${active ? "text-[#F9A602]" : "-translate-x-1.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
                         />
                       </Link>
                     </li>

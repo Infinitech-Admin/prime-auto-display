@@ -22,6 +22,15 @@ import {
 } from "lucide-react";
 import { fetchMe, logout, type AuthUser } from "@/lib/api";
 
+/*
+ * Color palette (from the Prime Auto Display logo)
+ *   Page background : #060606  (near black)
+ *   Surface         : #1C0606  (dark maroon: sidebar, search)
+ *   Logo red        : #9B1111  (active nav, logo tile, avatar, borders)
+ *   Logo gold       : #F5A800  (accents, highlights, focus, notification dot)
+ *   Logo cream      : #FFF6DC  (brand name, avatar initials)
+ */
+
 interface NavItem {
   label: string;
   href: string;
@@ -132,7 +141,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#060606]">
         <div className="flex items-center gap-2 text-sm text-zinc-400">
-          <Loader2 size={18} className="animate-spin text-[#FFFFFF]" />
+          <Loader2 size={18} className="animate-spin text-[#F5A800]" />
           Checking session...
         </div>
       </div>
@@ -144,28 +153,32 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#060606]/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#060606]/70 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/10 bg-[#060606] transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[#9B1111]/40 bg-gradient-to-b from-[#1C0606] to-[#0B0303] transition-transform duration-200 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-5">
-          <Link
-            href="/admin"
-            className="flex items-center gap-2 text-lg font-black text-white"
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF2D2D]/15 text-[#FFFFFF]">
-              <Car size={17} />
+        <div className="flex h-16 items-center justify-between border-b border-[#9B1111]/30 px-5">
+          <Link href="/admin" className="flex min-w-0 items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#F5A800]/70 bg-[#9B1111] text-[#FFF6DC] shadow-[0_0_18px_rgba(155,17,17,0.55)]">
+              <Car size={20} />
             </span>
-            Capital
-            <span className="text-[#FFFFFF]">Jey</span>
+
+            <span className="flex min-w-0 flex-col leading-none">
+              <span className="whitespace-nowrap text-[17px] font-black tracking-tight text-[#FFF6DC]">
+                Prime Auto
+              </span>
+              <span className="mt-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.3em] text-[#F5A800]">
+                Display
+              </span>
+            </span>
           </Link>
 
           <button
@@ -178,7 +191,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
+          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-600">
+            Menu
+          </p>
+
           {NAV_ITEMS.map((item) => {
             const active =
               item.href === "/admin"
@@ -211,13 +228,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-[#FF2D2D]/10 text-[#FFFFFF]"
-                    : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                    ? "bg-gradient-to-r from-[#9B1111]/45 to-[#9B1111]/5 text-white"
+                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <Icon size={17} />
+                {active && (
+                  <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r bg-[#F5A800]" />
+                )}
+                <Icon
+                  size={17}
+                  className={active ? "text-[#F5A800]" : undefined}
+                />
                 {item.label}
               </Link>
             );
@@ -225,10 +248,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Logout */}
-        <div className="border-t border-white/10 p-3">
+        <div className="border-t border-[#9B1111]/30 p-3">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-400 transition-colors hover:bg-[#9B1111]/20 hover:text-white"
           >
             <LogOut size={17} />
             Sign out
@@ -239,7 +262,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Main column */}
       <div className="lg:pl-64">
         {/* Header */}
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/10 bg-[#060606]/90 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-[#9B1111]/30 bg-[#060606]/90 px-4 backdrop-blur sm:px-6">
           {/* Mobile menu */}
           <button
             onClick={() => setSidebarOpen(true)}
@@ -259,7 +282,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <input
               type="text"
               placeholder="Search vehicles, orders..."
-              className="w-full rounded-lg border border-white/10 bg-[#111111]/70 py-2 pl-9 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-[#FF2D2D]/60"
+              className="w-full rounded-lg border border-[#9B1111]/40 bg-[#1C0606]/70 py-2 pl-9 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-[#F5A800]"
             />
           </div>
 
@@ -272,7 +295,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             >
               <Bell size={19} />
 
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#FF2D2D]" />
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#F5A800]" />
             </button>
 
             {/* User */}
@@ -288,7 +311,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               </div>
 
               <div
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF2D2D]/15 text-xs font-bold text-[#FFFFFF]"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#F5A800]/70 bg-[#9B1111] text-xs font-bold text-[#FFF6DC]"
                 title={user?.email}
               >
                 {getInitials(user?.name)}

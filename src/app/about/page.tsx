@@ -23,15 +23,21 @@ import Navbar from "../../components/layout/navbar";
 import Footer from "../../components/layout/footer";
 import CTA from "../../components/home/cta";
 
-// Source: Prime Auto Display Car Trading Facebook page.
+/*
+  Prime Auto Display palette
+  dark #1C0606 | maroon #9B1111 (hover #B91C1C) | gold #F9A602
+  cream #FDF5DC | card #FFFBEF
+*/
+
 const BUSINESS = {
-  name: "Prime Auto Display Car Trading",
-  address:
-    "Blk 28, Lot 26 Vatican City Drive, BF Resort Village, Talon Dos, Las Piñas City, Philippines, 1747",
-  phoneDisplay: "0997 253 0052",
-  phoneHref: "tel:+639972530052",
-  facebook: "https://www.facebook.com/CapitalJEYCarTrading/",
-  instagram: "https://www.instagram.com/capitaljautofocus",
+  name: "Prime Auto Display",
+  // TODO: confirm the address is still correct for Prime Auto Display.
+  address: "Bacoor, Philippines, 4102",
+  phoneDisplay: "0945 975 6255",
+  phoneHref: "tel:+639459756255",
+  email: "shirleyprimesdisplay@yahoo.com",
+  facebook: "https://www.facebook.com/profile.php?id=61553420834178",
+  tiktok: "https://www.tiktok.com/@prime.autodisplay",
 };
 
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -116,14 +122,14 @@ const values = [
 
 const socials = [
   { label: "Facebook", href: BUSINESS.facebook },
-  { label: "Instagram", href: BUSINESS.instagram },
+  { label: "TikTok", href: BUSINESS.tiktok },
 ];
 
-// Focus rings: black on light surfaces, white on dark ones.
+// Focus rings: dark on light surfaces, gold on dark ones.
 const ringLight =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1C0606]";
 const ringDark =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F9A602]";
 
 export default function About() {
   const [activeJourney, setActiveJourney] = useState(0);
@@ -133,43 +139,43 @@ export default function About() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-white text-[#1C0606]">
-        {/* HERO: photo, text on the left */}
-        <section className="relative flex min-h-[70vh] items-center overflow-hidden bg-[#1C0606]">
+      <main className="min-h-screen bg-[#FFFBEF] text-[#1C0606]">
+        {/* HERO: bright photo, text anchored bottom left */}
+        <section className="relative flex min-h-[64vh] items-end overflow-hidden bg-[#1C0606]">
           <Image
             src="/showroom-collection.jpg"
             alt="Prime Auto Display showroom"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-[65%_center]"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1C0606] via-[#1C0606]/75 to-[#1C0606]/20" />
+          <div className="absolute inset-0 bg-[#1C0606]/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1C0606] via-[#1C0606]/70 via-35% to-transparent to-70%" />
 
-          <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div className="max-w-2xl border-l-4 border-[#9B1111] pl-6 sm:pl-8">
-              <h1 className="text-5xl font-bold uppercase leading-none text-white sm:text-6xl lg:text-7xl">
-                Buy. Sell.
-                <span className="block text-[#F9A602]">Trade.</span>
+          <div className="relative mx-auto w-full max-w-7xl px-4 pb-14 pt-40 sm:px-6 lg:px-8 lg:pb-20">
+            <div className="max-w-3xl border-l-4 border-[#F9A602] pl-5 sm:pl-8">
+              <h1 className="text-5xl font-black uppercase leading-[0.92] tracking-tight text-[#FDF5DC] [text-shadow:0_2px_30px_rgba(0,0,0,0.55)] sm:text-6xl lg:text-7xl">
+                We buy, sell, and trade cars.
               </h1>
 
-              <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">
-                {BUSINESS.name} is a car dealership in Las Piñas City. We buy,
-                sell, and trade cars, with clear details and a straightforward
-                path to ownership.
+              <p className="mt-6 max-w-lg text-base leading-7 text-[#FDF5DC]/85 sm:text-lg">
+                {BUSINESS.name} is a car dealership in Las Piñas City. Clear
+                details, honest guidance, and a straightforward path to
+                ownership.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/showroom"
-                  className={`chamfer inline-flex items-center justify-center gap-2 bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C] ${ringDark}`}
+                  className={`chamfer inline-flex items-center justify-center gap-2 bg-[#F9A602] px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ringDark}`}
                 >
                   Browse the showroom
                   <ArrowRight size={16} />
                 </Link>
                 <Link
                   href="/sell-trade"
-                  className={`chamfer inline-flex items-center justify-center bg-white px-7 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ringDark}`}
+                  className={`chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#B91C1C] ${ringDark}`}
                 >
                   Sell / Trade your car
                 </Link>
@@ -180,26 +186,26 @@ export default function About() {
 
         <div aria-hidden="true" className="tread" />
 
-        {/* FACTS: solid red band */}
-        <section className="bg-[#9B1111] text-white">
+        {/* FACTS: solid maroon band */}
+        <section className="bg-[#9B1111] text-[#FDF5DC]">
           <ul className="mx-auto grid max-w-7xl grid-cols-1 gap-x-8 gap-y-4 px-4 py-5 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
             {facts.map(({ icon: Icon, text }) => (
               <li
                 key={text}
                 className="flex items-center gap-3 text-sm font-semibold"
               >
-                <Icon size={20} className="shrink-0" />
+                <Icon size={20} className="shrink-0 text-[#F9A602]" />
                 {text}
               </li>
             ))}
           </ul>
         </section>
 
-        {/* FIND US: one row, address / phone / directions / socials */}
+        {/* FIND US: address / phone / directions / socials */}
         <section className="border-b border-[#1C0606]/10 bg-[#FDF5DC]">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_auto] lg:items-center lg:px-8">
             <div className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-white">
+              <span className="chamfer flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-[#F9A602]">
                 <MapPin size={20} />
               </span>
               <div>
@@ -213,7 +219,7 @@ export default function About() {
             </div>
 
             <div className="flex gap-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-white">
+              <span className="chamfer flex h-11 w-11 shrink-0 items-center justify-center bg-[#1C0606] text-[#F9A602]">
                 <Phone size={20} />
               </span>
               <div>
@@ -232,7 +238,7 @@ export default function About() {
                 href={MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`chamfer inline-flex items-center justify-center gap-2 bg-[#1C0606] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#9B1111] ${ringLight}`}
+                className={`chamfer inline-flex items-center justify-center gap-2 bg-[#1C0606] px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-[#FDF5DC] transition-colors hover:bg-[#9B1111] ${ringLight}`}
               >
                 Get directions
                 <ArrowUpRight size={16} />
@@ -243,7 +249,7 @@ export default function About() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`border-2 border-[#1C0606] px-4 py-3 text-sm font-bold text-[#1C0606] transition-colors hover:bg-[#1C0606] hover:text-white ${ringLight}`}
+                  className={`border-2 border-[#1C0606] px-4 py-3 text-sm font-bold text-[#1C0606] transition-colors hover:bg-[#1C0606] hover:text-[#FDF5DC] ${ringLight}`}
                 >
                   {social.label}
                 </a>
@@ -252,9 +258,9 @@ export default function About() {
           </div>
         </section>
 
-        {/* WHAT WE DO: full-width rows that flip to black on hover */}
+        {/* WHAT WE DO: full-width rows that flip to dark on hover */}
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <h2 className="max-w-2xl text-4xl font-bold uppercase leading-none sm:text-5xl">
+          <h2 className="max-w-2xl text-4xl font-black uppercase leading-none sm:text-5xl">
             One dealership for every way you move.
           </h2>
 
@@ -262,22 +268,22 @@ export default function About() {
             {services.map(({ icon: Icon, title, description, href, cta }) => (
               <li
                 key={title}
-                className="group grid gap-5 border-t border-[#1C0606]/15 px-0 py-8 transition-colors duration-200 hover:bg-[#1C0606] hover:text-white md:grid-cols-[0.8fr_1.4fr_auto] md:items-center md:gap-10 md:px-6"
+                className="group grid gap-5 border-t border-[#1C0606]/15 px-0 py-8 transition-colors duration-200 hover:bg-[#1C0606] hover:text-[#FDF5DC] md:grid-cols-[0.8fr_1.4fr_auto] md:items-center md:gap-10 md:px-6"
               >
                 <div className="flex items-center gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-[#9B1111] text-white">
+                  <span className="chamfer flex h-12 w-12 shrink-0 items-center justify-center bg-[#9B1111] text-[#F9A602]">
                     <Icon size={22} />
                   </span>
                   <h3 className="text-2xl font-bold uppercase">{title}</h3>
                 </div>
 
-                <p className="text-base leading-7 text-[#1C0606]/65 transition-colors group-hover:text-white/70">
+                <p className="text-base leading-7 text-[#1C0606]/65 transition-colors group-hover:text-[#FDF5DC]/75">
                   {description}
                 </p>
 
                 <Link
                   href={href}
-                  className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#9B1111] transition-colors group-hover:text-white ${ringLight}`}
+                  className={`inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-[#9B1111] transition-colors group-hover:text-[#F9A602] ${ringLight}`}
                 >
                   {cta}
                   <ArrowRight size={16} />
@@ -288,10 +294,10 @@ export default function About() {
         </section>
 
         {/* HOW IT WORKS: tabs, one path at a time */}
-        <section className="bg-[#1C0606] text-white">
+        <section className="bg-[#1C0606] text-[#FDF5DC]">
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-              <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl">
+              <h2 className="border-l-8 border-[#F9A602] pl-5 text-4xl font-black uppercase leading-none sm:text-5xl">
                 How it works
               </h2>
 
@@ -310,7 +316,7 @@ export default function About() {
                       role="tab"
                       aria-selected={selected}
                       onClick={() => setActiveJourney(index)}
-                      className={`chamfer px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors ${ringDark} ${selected ? "bg-[#9B1111] text-white" : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"}`}
+                      className={`chamfer px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors ${ringDark} ${selected ? "bg-[#F9A602] text-[#1C0606]" : "bg-[#FDF5DC]/10 text-[#FDF5DC]/75 hover:bg-[#FDF5DC]/20 hover:text-[#FDF5DC]"}`}
                     >
                       {item.tab}
                     </button>
@@ -325,27 +331,30 @@ export default function About() {
               className="mt-12 grid gap-8 md:grid-cols-3"
             >
               {journey.steps.map((step, index) => (
-                <li key={step} className="border-t-2 border-white/20 pt-5">
+                <li key={step} className="border-t-2 border-[#FDF5DC]/20 pt-5">
                   <span className="mb-4 flex items-center gap-3">
-                    <span className="h-3 w-3 bg-[#9B1111]" />
-                    <span className="text-sm font-semibold text-white/60">
+                    <span className="h-3 w-3 bg-[#F9A602]" />
+                    <span className="text-sm font-semibold text-[#FDF5DC]/60">
                       Step {index + 1}
                     </span>
                   </span>
-                  <p className="text-lg leading-7 text-white/90">{step}</p>
+                  <p className="text-lg leading-7 text-[#FDF5DC]/90">{step}</p>
                 </li>
               ))}
             </ol>
           </div>
         </section>
 
-        {/* VALUES: statement, then three columns with a red edge */}
+        {/* VALUES: statement, then three columns with a gold edge */}
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="max-w-3xl">
-            <h2 className="text-4xl font-bold uppercase leading-none sm:text-5xl lg:text-6xl">
-              We make buying feel confident,{" "}
-              <span className="text-[#9B1111]">not complicated.</span>
+            <h2 className="text-4xl font-black uppercase leading-none sm:text-5xl lg:text-6xl">
+              We make buying feel confident, not complicated.
             </h2>
+            <div aria-hidden="true" className="mt-6 flex h-1.5 w-28">
+              <span className="w-2/3 bg-[#9B1111]" />
+              <span className="w-1/3 bg-[#F9A602]" />
+            </div>
             <p className="mt-6 max-w-xl text-base leading-7 text-[#1C0606]/70 sm:text-lg">
               Whether you&apos;re shopping for a family SUV, a city car, or a
               pickup for work, we help you find something that fits your life
@@ -355,8 +364,8 @@ export default function About() {
 
           <ul className="mt-14 grid gap-10 md:grid-cols-3">
             {values.map(({ icon: Icon, title, description }) => (
-              <li key={title} className="border-l-4 border-[#9B1111] pl-6">
-                <Icon size={30} className="text-[#1C0606]" strokeWidth={1.8} />
+              <li key={title} className="border-l-4 border-[#F9A602] pl-6">
+                <Icon size={30} className="text-[#9B1111]" strokeWidth={1.8} />
                 <h3 className="mt-4 text-2xl font-bold uppercase">{title}</h3>
                 <p className="mt-3 text-base leading-7 text-[#1C0606]/65">
                   {description}
