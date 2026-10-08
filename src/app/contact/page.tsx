@@ -719,7 +719,7 @@ export default function Contact() {
         </section>
 
         {/* BOTTOM BAND: cream, the light contrast before the footer */}
-        <section className="bg-[#FDF5DC] text-[#1C0606]">
+        {/* <section className="bg-[#FDF5DC] text-[#1C0606]">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div className="border-l-8 border-[#9B1111] pl-5">
               <h2 className="text-4xl font-black uppercase leading-none sm:text-5xl">
@@ -731,7 +731,7 @@ export default function Contact() {
               </p>
             </div>
 
-            {/* <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/showroom"
                 className={`chamfer inline-flex items-center justify-center bg-[#9B1111] px-7 py-4 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#1C0606] ${ringLight}`}
@@ -745,9 +745,9 @@ export default function Contact() {
               >
                 Sell / Trade Car
               </Link>
-            </div> */}
+            </div>
           </div>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
