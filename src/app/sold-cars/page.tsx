@@ -21,6 +21,7 @@ import Footer from "@/components/layout/footer";
 import {
   MEDIA_BASE_URL,
   fetchSoldVehicles,
+  hasPrice,
   isAbortError,
   resolveMediaUrl,
   type ApiError,
@@ -107,10 +108,17 @@ export default function SoldCarsPage() {
           return Number(b.year) - Number(a.year);
         case "oldest":
           return Number(a.year) - Number(b.year);
-        case "price-low":
-          return a.price_value - b.price_value;
-        case "price-high":
-          return b.price_value - a.price_value;
+        // Cars without a price always go to the end.
+        case "price-low": {
+          const pa = hasPrice(a) ? a.price_value : Infinity;
+          const pb = hasPrice(b) ? b.price_value : Infinity;
+          return pa === pb ? 0 : pa - pb;
+        }
+        case "price-high": {
+          const pa = hasPrice(a) ? a.price_value : -Infinity;
+          const pb = hasPrice(b) ? b.price_value : -Infinity;
+          return pa === pb ? 0 : pb - pa;
+        }
         default:
           return 0;
       }
@@ -365,6 +373,8 @@ export default function SoldCarsPage() {
                 <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                   {paginatedCars.map((car) => {
                     const imageSrc = resolveMediaUrl(car.image, MEDIA_BASE_URL);
+                    // Only show "Sold at" when the car has a real price.
+                    const showPrice = SHOW_PRICE && hasPrice(car);
 
                     return (
                       <Link
@@ -402,7 +412,7 @@ export default function SoldCarsPage() {
                             <h3 className="mt-1 text-2xl font-bold uppercase leading-tight">
                               {car.name}
                             </h3>
-                            {SHOW_PRICE && (
+                            {showPrice && (
                               <span className="mt-2 block text-lg font-black text-[#1C0606]/65">
                                 <span className="mr-1.5 text-xs font-semibold text-[#1C0606]/55">
                                   Sold at
