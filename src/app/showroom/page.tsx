@@ -22,7 +22,9 @@ import Footer from "@/components/layout/footer";
 import { useCart } from "@/context/cart-context";
 import {
   MEDIA_BASE_URL,
+  PRICE_FALLBACK,
   fetchVehicles,
+  hasPrice,
   isAbortError,
   resolveMediaUrl,
   type ApiError,
@@ -141,11 +143,13 @@ export default function ShowroomPage() {
         );
       const matchesType = typeFilter === "all" || car.type === typeFilter;
       const p = car.price_value;
+      // Cars without a price only show under "All prices".
       const matchesPrice =
         priceRange === "all" ||
-        (priceRange === "under-50k" && p < 50000) ||
-        (priceRange === "50k-70k" && p >= 50000 && p <= 70000) ||
-        (priceRange === "70k-plus" && p > 70000);
+        (hasPrice(car) &&
+          ((priceRange === "under-50k" && p < 50000) ||
+            (priceRange === "50k-70k" && p >= 50000 && p <= 70000) ||
+            (priceRange === "70k-plus" && p > 70000)));
       return matchesSearch && matchesType && matchesPrice;
     });
 
@@ -155,10 +159,17 @@ export default function ShowroomPage() {
           return Number(b.year) - Number(a.year);
         case "oldest":
           return Number(a.year) - Number(b.year);
-        case "price-low":
-          return a.price_value - b.price_value;
-        case "price-high":
-          return b.price_value - a.price_value;
+        // Cars without a price always go to the end.
+        case "price-low": {
+          const pa = hasPrice(a) ? a.price_value : Infinity;
+          const pb = hasPrice(b) ? b.price_value : Infinity;
+          return pa === pb ? 0 : pa - pb;
+        }
+        case "price-high": {
+          const pa = hasPrice(a) ? a.price_value : -Infinity;
+          const pb = hasPrice(b) ? b.price_value : -Infinity;
+          return pa === pb ? 0 : pb - pa;
+        }
         default:
           return 0;
       }
@@ -199,6 +210,8 @@ export default function ShowroomPage() {
   const handleAddToCart = (event: React.MouseEvent, car: Vehicle) => {
     event.preventDefault();
     event.stopPropagation();
+    // Safety net: never add a car without a real price.
+    if (!hasPrice(car)) return;
     addToCart({
       id: car.id,
       name: car.name,
@@ -405,6 +418,8 @@ export default function ShowroomPage() {
                     {paginatedCars.map((car) => {
                       const unavailable =
                         car.status !== "available" || car.stock <= 0;
+                      const priced = hasPrice(car);
+                      const cartDisabled = unavailable || !priced;
                       const imageSrc = resolveMediaUrl(
                         car.image,
                         MEDIA_BASE_URL,
@@ -415,9 +430,11 @@ export default function ShowroomPage() {
                           : car.status === "reserved"
                             ? "Reserved"
                             : "Out of stock"
-                        : recentlyAdded.includes(car.id)
-                          ? "Added ✓"
-                          : "Add to cart";
+                        : !priced
+                          ? "Inquire first"
+                          : recentlyAdded.includes(car.id)
+                            ? "Added ✓"
+                            : "Add to cart";
                       const badgeText =
                         unavailable && car.status !== "available"
                           ? car.status
@@ -456,8 +473,14 @@ export default function ShowroomPage() {
                                 No image available
                               </div>
                             )}
-                            <span className="absolute bottom-0 left-0 bg-[#F9A602] px-4 py-2 text-xl font-black text-[#1C0606]">
-                              {car.price}
+                            <span
+                              className={`absolute bottom-0 left-0 bg-[#F9A602] px-4 py-2 font-black text-[#1C0606] ${
+                                priced
+                                  ? "text-xl"
+                                  : "text-sm uppercase tracking-wide"
+                              }`}
+                            >
+                              {priced ? car.price : PRICE_FALLBACK}
                             </span>
                           </div>
 
@@ -510,7 +533,7 @@ export default function ShowroomPage() {
                             <div className="mt-auto flex items-center gap-3 pt-5">
                               <button
                                 type="button"
-                                disabled={unavailable}
+                                disabled={cartDisabled}
                                 onClick={(e) => handleAddToCart(e, car)}
                                 className="flex-1 bg-[#9B1111] px-4 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-[#F9A602] hover:text-[#1C0606] disabled:cursor-not-allowed disabled:bg-[#FDF5DC]/10 disabled:text-[#FDF5DC]/40 disabled:hover:bg-[#FDF5DC]/10 disabled:hover:text-[#FDF5DC]/40"
                               >

@@ -10,7 +10,6 @@ import {
   Calendar,
   Fuel,
   Gauge,
-  MapPin,
   Play,
   RotateCcw,
   Settings2,
@@ -27,7 +26,9 @@ import FinancingCalculator from "@/components/financing-calculator";
 import { useCart } from "@/context/cart-context";
 import {
   MEDIA_BASE_URL,
+  PRICE_FALLBACK,
   fetchVehicle,
+  hasPrice,
   isAbortError,
   resolveMediaUrl,
   type ApiError,
@@ -410,9 +411,12 @@ export default function CarDetailsPage() {
   }, [car]);
 
   const unavailable = !car || car.status !== "available" || car.stock <= 0;
+  const priced = !!car && hasPrice(car);
+  // Cart is blocked when the car is unavailable OR has no real price.
+  const cartBlocked = unavailable || !priced;
 
   const handleAddToCart = () => {
-    if (!car || unavailable) return;
+    if (!car || cartBlocked) return;
     addToCart({
       id: car.id,
       name: car.name,
@@ -470,9 +474,11 @@ export default function CarDetailsPage() {
           : "Not available";
   const cartLabel = unavailable
     ? statusLabel
-    : justAdded
-      ? "Added to cart ✓"
-      : "Add to cart";
+    : !priced
+      ? "Cart unavailable"
+      : justAdded
+        ? "Added to cart ✓"
+        : "Add to cart";
 
   const quickFacts = [
     { icon: Calendar, label: "Year", value: car.year },
@@ -598,9 +604,15 @@ export default function CarDetailsPage() {
               {/* RIGHT: price, specs, actions, financing */}
               <div className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:space-y-8">
                 <aside className={`${panel} p-5 sm:p-6`}>
-                  <p className="text-sm text-[#FDF5DC]/55">Starting price</p>
-                  <p className="mt-1 text-4xl font-black text-[#F9A602] sm:text-5xl">
-                    {car.price}
+                  <p className="text-sm text-[#FDF5DC]/55">
+                    {priced ? "Starting price" : "Pricing"}
+                  </p>
+                  <p
+                    className={`mt-1 font-black text-[#F9A602] ${
+                      priced ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl"
+                    }`}
+                  >
+                    {priced ? car.price : PRICE_FALLBACK}
                   </p>
 
                   <dl className="mt-6 space-y-3 border-y border-[#FDF5DC]/10 py-5 text-sm sm:text-base">
@@ -618,12 +630,14 @@ export default function CarDetailsPage() {
                   </dl>
 
                   <p className="mt-4 text-xs leading-5 text-[#FDF5DC]/55">
-                    Reserve this car with a 20% downpayment at checkout.
+                    {priced
+                      ? "Reserve this car with a 20% downpayment at checkout."
+                      : "The price for this car isn’t listed yet. Send us a message and we’ll get back to you with the details."}
                   </p>
 
                   <button
                     type="button"
-                    disabled={unavailable}
+                    disabled={cartBlocked}
                     onClick={handleAddToCart}
                     className={`${cartBtn} mt-5`}
                   >
@@ -641,41 +655,60 @@ export default function CarDetailsPage() {
                     </button>
                     <Link
                       href="/contact"
-                      className={`inline-flex items-center justify-center border-2 border-[#FDF5DC]/25 px-5 py-4 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ring}`}
+                      className={
+                        priced
+                          ? `inline-flex items-center justify-center border-2 border-[#FDF5DC]/25 px-5 py-4 text-sm font-bold uppercase tracking-wider transition-colors hover:border-[#F9A602] hover:text-[#F9A602] ${ring}`
+                          : `chamfer inline-flex items-center justify-center bg-[#F9A602] px-5 py-4 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`
+                      }
                     >
-                      Ask a question
+                      {priced ? "Ask a question" : PRICE_FALLBACK}
                     </Link>
                   </div>
                 </aside>
 
-                <FinancingCalculator
-                  key={`financing-${car.id}`}
-                  carName={car.name}
-                  price={car.price}
-                  year={car.year}
-                />
+                {priced && (
+                  <FinancingCalculator
+                    key={`financing-${car.id}`}
+                    carName={car.name}
+                    price={car.price}
+                    year={car.year}
+                  />
+                )}
               </div>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Mobile sticky bar: price and cart always in reach */}
+      {/* Mobile sticky bar: price and main action always in reach */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t-4 border-[#F9A602] bg-[#1C0606] px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
         <div className="min-w-0">
           <p className="text-xs text-[#FDF5DC]/55">Price</p>
-          <p className="truncate text-xl font-black text-[#F9A602]">
-            {car.price}
+          <p
+            className={`truncate font-black text-[#F9A602] ${
+              priced ? "text-xl" : "text-base"
+            }`}
+          >
+            {priced ? car.price : PRICE_FALLBACK}
           </p>
         </div>
-        <button
-          type="button"
-          disabled={unavailable}
-          onClick={handleAddToCart}
-          className={`${cartBtn} !w-auto flex-1 !py-3`}
-        >
-          {cartLabel}
-        </button>
+        {priced ? (
+          <button
+            type="button"
+            disabled={cartBlocked}
+            onClick={handleAddToCart}
+            className={`${cartBtn} !w-auto flex-1 !py-3`}
+          >
+            {cartLabel}
+          </button>
+        ) : (
+          <Link
+            href="/contact"
+            className={`chamfer flex flex-1 items-center justify-center bg-[#F9A602] px-5 py-3 text-sm font-bold uppercase tracking-wider text-[#1C0606] transition-colors hover:bg-[#FDF5DC] ${ring}`}
+          >
+            Inquire
+          </Link>
+        )}
       </div>
 
       <TestDriveDialog
