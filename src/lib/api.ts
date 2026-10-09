@@ -19,7 +19,6 @@ export const MEDIA_BASE_URL =
   process.env.NEXT_PUBLIC_MEDIA_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
   (process.env.NODE_ENV === "production" ? "" : "http://localhost:8000");
-
 export interface ApiError extends Error {
   status?: number;
   errors?: Record<string, string[]> | null;
@@ -301,7 +300,11 @@ export const updateVehicle = (id: number, payload: VehiclePayload) =>
     method: "PUT",
     body: payload,
   });
-
+export const updateVehicleStatus = (id: number, status: Vehicle["status"]) =>
+  apiRequest<{ data: Vehicle }>(`/admin/vehicles/${id}/status`, {
+    method: "PATCH",
+    body: { status },
+  });
 export const deleteVehicle = (id: number) =>
   apiRequest(`/admin/vehicles/${id}`, { method: "DELETE" });
 
