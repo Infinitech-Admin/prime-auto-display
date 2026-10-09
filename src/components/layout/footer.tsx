@@ -11,14 +11,14 @@ import { Wordmark } from "@/components/layout/wordmark";
 const BUSINESS_NAME = "Prime Auto Display";
 const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61553420834178";
 const TIKTOK_URL = "https://www.tiktok.com/@prime.autodisplay";
-const ADDRESS_LINE_1 = "Blk 28, Lot 26 Vatican City Drive,";
-const ADDRESS_LINE_2 = "BF Resort Village, Talon Dos, Las Piñas City 1747";
+const ADDRESS_LINE_1 = "Bacoor, Philippines 4102";
+const ADDRESS_LINE_2 = "";
 const PHONE_DISPLAY = "0945 975 6255";
 const PHONE_TEL = "+639459756255";
 const EMAIL = "shirleyprimesdisplay@yahoo.com";
 
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  `${BUSINESS_NAME}, ${ADDRESS_LINE_1}, ${ADDRESS_LINE_2}`,
+  [BUSINESS_NAME, ADDRESS_LINE_1, ADDRESS_LINE_2].filter(Boolean).join(", "),
 )}`;
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -170,8 +170,12 @@ export default function Footer() {
                 <MapPin className="mt-0.5 size-4 shrink-0 text-[#F9A602]" />
                 <address className="not-italic">
                   {ADDRESS_LINE_1}
-                  <br />
-                  {ADDRESS_LINE_2}
+                  {ADDRESS_LINE_2 && (
+                    <>
+                      <br />
+                      {ADDRESS_LINE_2}
+                    </>
+                  )}
                 </address>
               </a>
 
